@@ -96,3 +96,10 @@ coverage.xml
 # Misc
 # ----------------------------
 .idea/
+
+# Python Environment
+.python-version
+
+# Ruff / Pyright
+.ruff_cache/
+.pyright/

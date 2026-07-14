@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nivaas-v1"
+version = "0.1.0"
+description = "AI-powered Bangalore Livability Intelligence Platform"
+readme = "README.md"
+requires-python = ">=3.13"
+license = { text = "MIT" }
+authors = [
+    { name = "Zaiba Muskan" }
+]
