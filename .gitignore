@@ -103,3 +103,15 @@ coverage.xml
 # Ruff / Pyright
 .ruff_cache/
 .pyright/
+
+# Python caches
+.cache/
+
+# Local databases
+*.db
+
+# Environment files
+.env.local
+
+# macOS
+.AppleDouble
