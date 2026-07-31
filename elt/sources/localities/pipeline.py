@@ -16,9 +16,10 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True, slots=True)
 class LocalityPipelineResult:
-    requested: int
-    resolved: int
-    unresolved: tuple[str, ...]
+    requested_localities: int
+    resolved_localities: int
+    unresolved_localities: tuple[str, ...]
+    deferred_corridors: tuple[str, ...]
     rejected: tuple[str, ...]
     amenities_assigned: int
 
@@ -28,17 +29,37 @@ def run_locality_pipeline(
 ) -> LocalityPipelineResult:
     logger.info("Starting NIVAAS locality ingestion")
 
+    locality_targets = tuple(
+        target
+        for target in TARGET_LOCALITIES
+        if target.area_type == "locality"
+    )
+
+    corridor_targets = tuple(
+        target
+        for target in TARGET_LOCALITIES
+        if target.area_type == "corridor"
+    )
+
     resolved = 0
     unresolved: list[str] = []
 
     # ---------------------------------------------------------
-    # 1. Resolve target localities from OpenStreetMap
+    # 1. Resolve neighbourhood/locality polygons
     # ---------------------------------------------------------
 
-    with LocalityClient() as client:
-        for target in TARGET_LOCALITIES:
+    with (
+        LocalityClient() as client,
+        get_connection(settings) as connection,
+    ):
+        repository = LocalityRepository(connection)
+
+        for target in locality_targets:
             candidates = client.search(target)
-            boundary = select_boundary(target, candidates)
+            boundary = select_boundary(
+                target,
+                candidates,
+            )
 
             if boundary is None:
                 logger.warning(
@@ -48,10 +69,7 @@ def run_locality_pipeline(
                 unresolved.append(target.name)
                 continue
 
-            with get_connection(settings) as connection:
-                repository = LocalityRepository(connection)
-                repository.upsert(boundary)
-
+            repository.upsert(boundary)
             resolved += 1
 
             logger.info(
@@ -61,55 +79,70 @@ def run_locality_pipeline(
                 boundary.source_id,
             )
 
-    # ---------------------------------------------------------
-    # 2. Geometry quality assurance
-    # ---------------------------------------------------------
+        # -----------------------------------------------------
+        # 2. Geometry quality assurance
+        # -----------------------------------------------------
 
-    minimum_areas = {
-        target.name: target.min_area_km2
-        for target in TARGET_LOCALITIES
-        if target.area_type == "locality"
-    }
-
-    with get_connection(settings) as connection:
-        repository = LocalityRepository(connection)
+        minimum_areas = {
+            target.name: target.min_area_km2
+            for target in locality_targets
+        }
 
         rejected = repository.delete_implausible_boundaries(
             minimum_areas
         )
 
-    for name in rejected:
-        logger.warning(
-            "Rejected implausible locality boundary: %s",
-            name,
-        )
+        for name in rejected:
+            logger.warning(
+                "Rejected implausible locality boundary: %s",
+                name,
+            )
 
-    # ---------------------------------------------------------
-    # 3. Spatially assign amenities to accepted localities
-    # ---------------------------------------------------------
+        # A locality may have passed candidate normalization but failed
+        # the PostGIS area QA. Do not report it as successfully resolved.
+        rejected_set = set(rejected)
+        resolved_after_qa = resolved - len(rejected_set)
 
-    with get_connection(settings) as connection:
-        repository = LocalityRepository(connection)
+        # -----------------------------------------------------
+        # 3. Spatially assign amenities
+        # -----------------------------------------------------
 
         amenities_assigned = repository.assign_amenities()
+
+    deferred_corridors = tuple(
+        target.name
+        for target in corridor_targets
+    )
+
+    for corridor in deferred_corridors:
+        logger.info(
+            "Deferred corridor geometry: %s",
+            corridor,
+        )
 
     logger.info(
         (
             "Locality ingestion completed: "
-            "requested=%s resolved=%s unresolved=%s "
-            "rejected=%s amenities_assigned=%s"
+            "requested_localities=%s "
+            "resolved_localities=%s "
+            "unresolved_localities=%s "
+            "rejected=%s "
+            "deferred_corridors=%s "
+            "amenities_assigned=%s"
         ),
-        len(TARGET_LOCALITIES),
-        resolved,
+        len(locality_targets),
+        resolved_after_qa,
         len(unresolved),
         len(rejected),
+        len(deferred_corridors),
         amenities_assigned,
     )
 
     return LocalityPipelineResult(
-        requested=len(TARGET_LOCALITIES),
-        resolved=resolved,
-        unresolved=tuple(unresolved),
+        requested_localities=len(locality_targets),
+        resolved_localities=resolved_after_qa,
+        unresolved_localities=tuple(unresolved),
+        deferred_corridors=deferred_corridors,
         rejected=tuple(rejected),
         amenities_assigned=amenities_assigned,
     )

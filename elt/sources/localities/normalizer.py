@@ -18,6 +18,15 @@ def normalize_candidate(
     target: TargetLocality,
     candidate: dict[str, Any],
 ) -> LocalityBoundary | None:
+    """
+    Convert a Nominatim result into a NIVAAS locality boundary.
+
+    Only polygonal OSM ways/relations located within the Bengaluru
+    operating envelope are accepted.
+    """
+    if target.area_type != "locality":
+        return None
+
     osm_type = candidate.get("osm_type")
     osm_id = candidate.get("osm_id")
     geojson = candidate.get("geojson")
@@ -69,8 +78,16 @@ def select_boundary(
     target: TargetLocality,
     candidates: list[dict[str, Any]],
 ) -> LocalityBoundary | None:
+    """
+    Return the first structurally acceptable locality polygon.
+
+    Physical plausibility is independently checked later by PostGIS.
+    """
     for candidate in candidates:
-        boundary = normalize_candidate(target, candidate)
+        boundary = normalize_candidate(
+            target,
+            candidate,
+        )
 
         if boundary is not None:
             return boundary

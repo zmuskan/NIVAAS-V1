@@ -20,17 +20,18 @@ def main() -> None:
     print()
     print("NIVAAS LOCALITY INGESTION")
     print("-------------------------")
-    print(f"Requested:          {result.requested}")
-    print(f"Resolved:           {result.resolved}")
-    print(f"Unresolved:         {len(result.unresolved)}")
-    print(f"Rejected by QA:     {len(result.rejected)}")
-    print(f"Amenities assigned: {result.amenities_assigned}")
+    print(f"Localities requested: {result.requested_localities}")
+    print(f"Localities resolved:  {result.resolved_localities}")
+    print(f"Unresolved:           {len(result.unresolved_localities)}")
+    print(f"Rejected by QA:       {len(result.rejected)}")
+    print(f"Deferred corridors:   {len(result.deferred_corridors)}")
+    print(f"Amenities assigned:   {result.amenities_assigned}")
 
-    if result.unresolved:
+    if result.unresolved_localities:
         print()
         print("Unresolved localities:")
 
-        for name in result.unresolved:
+        for name in result.unresolved_localities:
             print(f"  - {name}")
 
     if result.rejected:
@@ -38,6 +39,13 @@ def main() -> None:
         print("Rejected by geometry QA:")
 
         for name in result.rejected:
+            print(f"  - {name}")
+
+    if result.deferred_corridors:
+        print()
+        print("Deferred corridor modelling:")
+
+        for name in result.deferred_corridors:
             print(f"  - {name}")
 
 

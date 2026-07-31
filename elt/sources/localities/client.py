@@ -34,38 +34,99 @@ class LocalityClient:
             },
         )
 
+    def _search_name(
+        self,
+        *,
+        name: str,
+        city: str,
+        state: str,
+    ) -> list[dict[str, Any]]:
+        query = f"{name}, {city}, {state}, India"
+
+        logger.info(
+            "Searching locality boundary: %s",
+            query,
+        )
+
+        try:
+            response = self._client.get(
+                self.BASE_URL,
+                params={
+                    "q": query,
+                    "format": "jsonv2",
+                    "polygon_geojson": 1,
+                    "addressdetails": 1,
+                    "limit": 5,
+                    "countrycodes": "in",
+                },
+            )
+
+            response.raise_for_status()
+
+            payload = response.json()
+
+            if not isinstance(payload, list):
+                raise ValueError(
+                    f"Unexpected Nominatim response for {name}"
+                )
+
+            return [
+                candidate
+                for candidate in payload
+                if isinstance(candidate, dict)
+            ]
+
+        finally:
+            # Respect the public Nominatim service.
+            time.sleep(self.request_delay_seconds)
+
     def search(
         self,
         locality: TargetLocality,
     ) -> list[dict[str, Any]]:
-        query = f"{locality.name}, {locality.city}, {locality.state}, India"
+        """
+        Search using the canonical locality name followed by configured
+        aliases.
 
-        logger.info("Searching locality boundary: %s", query)
+        Results are deduplicated using the OSM object type and ID.
+        """
+        candidates: list[dict[str, Any]] = []
+        seen: set[tuple[str, int]] = set()
 
-        response = self._client.get(
-            self.BASE_URL,
-            params={
-                "q": query,
-                "format": "jsonv2",
-                "polygon_geojson": 1,
-                "addressdetails": 1,
-                "limit": 5,
-                "countrycodes": "in",
-            },
-        )
-
-        response.raise_for_status()
-
-        payload = response.json()
-
-        if not isinstance(payload, list):
-            raise ValueError(
-                f"Unexpected Nominatim response for {locality.name}"
+        for search_name in locality.search_names:
+            results = self._search_name(
+                name=search_name,
+                city=locality.city,
+                state=locality.state,
             )
 
-        time.sleep(self.request_delay_seconds)
+            for candidate in results:
+                osm_type = candidate.get("osm_type")
+                osm_id = candidate.get("osm_id")
 
-        return payload
+                if (
+                    isinstance(osm_type, str)
+                    and isinstance(osm_id, int)
+                ):
+                    identity = (
+                        osm_type,
+                        osm_id,
+                    )
+
+                    if identity in seen:
+                        continue
+
+                    seen.add(identity)
+
+                candidates.append(candidate)
+
+        logger.info(
+            "Collected %s unique candidates for %s",
+            len(candidates),
+            locality.name,
+        )
+
+        return candidates
 
     def close(self) -> None:
         self._client.close()
