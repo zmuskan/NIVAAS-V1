@@ -54,10 +54,11 @@ postgres-data/
 
 # ----------------------------
 # Database Dumps
-# ----------------------------
-*.sql
 *.dump
 *.bak
+
+# SQL source files under db/ are version controlled
+!db/**/*.sql# ----------------------------
 
 # ----------------------------
 # Data Exports
