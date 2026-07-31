@@ -160,6 +160,7 @@ CREATE TABLE core.amenity (
     latitude DOUBLE PRECISION NOT NULL,
     longitude DOUBLE PRECISION NOT NULL,
     geometry GEOMETRY(POINT, 4326) NOT NULL,
+    osm_type VARCHAR(20),
     osm_id BIGINT,
     rating NUMERIC(3,2),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -168,6 +169,15 @@ CREATE TABLE core.amenity (
     CONSTRAINT fk_amenity_locality
         FOREIGN KEY (locality_id)
         REFERENCES core.locality(locality_id),
+
+    CONSTRAINT uq_amenity_osm_identity
+        UNIQUE (osm_type, osm_id),
+
+    CONSTRAINT chk_amenity_osm_type
+        CHECK (
+            osm_type IS NULL
+            OR osm_type IN ('node', 'way', 'relation')
+        ),
 
     CONSTRAINT chk_amenity_latitude
         CHECK (latitude BETWEEN -90 AND 90),

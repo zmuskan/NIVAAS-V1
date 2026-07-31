@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,7 +8,25 @@ version = "0.1.0"
 description = "AI-powered Bangalore Livability Intelligence Platform"
 readme = "README.md"
 requires-python = ">=3.13"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
     { name = "Zaiba Muskan" }
 ]
+
+dependencies = [
+    "httpx>=0.28,<1.0",
+    "psycopg[binary]>=3.2,<4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3,<9.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["elt*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"
