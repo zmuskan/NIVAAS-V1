@@ -78,3 +78,31 @@ develop
 
 2026-07-14
 
+## Completed
+
+- [x] Docker
+- [x] PostgreSQL
+- [x] PostGIS
+- [x] pgvector
+- [x] Database schema
+- [x] Metadata schema
+- [x] OSM ingestion
+- [x] Rental ingestion
+- [x] Raw data ingestion
+
+## In Progress
+
+- [ ] Raw → Staging
+
+## Planned
+
+- [ ] Property matching
+- [ ] Feature Store
+- [ ] ML
+- [ ] FastAPI
+- [ ] Frontend
+
+
+## Last Updated
+
+2026-09-02
