@@ -1,25 +1,49 @@
+import re
+
 from .models import RawRentalListing
 
 
 class RentalParser:
-    """Convert raw API responses into RawRentalListing objects."""
+    """Parse Bangalore rental CSV rows."""
 
     @staticmethod
-    def parse(data: dict, source_name: str) -> RawRentalListing:
+    def parse(row: dict) -> RawRentalListing:
+
+        rent = float(str(row["price"]).replace(",", ""))
+
+        bathrooms = int(
+            re.search(r"\d+", row["bathroom"]).group()
+        )
+
         return RawRentalListing(
-            source_name=source_name,
-            external_listing_id=str(data.get("id", "")),
-            title=data.get("title"),
-            description=data.get("description"),
-            property_type=data.get("property_type"),
-            bhk=data.get("bhk"),
-            rent_amount=data.get("rent"),
-            deposit_amount=data.get("deposit"),
-            maintenance_amount=data.get("maintenance"),
-            furnishing_status=data.get("furnishing"),
-            area_sqft=data.get("area_sqft"),
-            locality=data.get("locality"),
-            latitude=data.get("latitude"),
-            longitude=data.get("longitude"),
-            listing_url=data.get("url"),
+
+            source_name="bangalore_rent_dataset",
+
+            external_listing_id="",
+
+            title=None,
+
+            description=None,
+
+            property_type=row["property_type"],
+
+            bhk=int(row["bedroom"]),
+
+            rent_amount=rent,
+
+            deposit_amount=None,
+
+            maintenance_amount=None,
+
+            furnishing_status=row["furnish_type"],
+
+            area_sqft=float(row["area"]),
+
+            locality=row["locality"],
+
+            latitude=None,
+
+            longitude=None,
+
+            listing_url=None,
         )
