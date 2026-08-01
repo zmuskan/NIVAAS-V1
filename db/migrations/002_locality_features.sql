@@ -1,9 +1,9 @@
+-- ============================================================
+-- NIVAAS
+-- Locality Feature Store
+-- ============================================================
 
--- ------------------------------------------------------------
--- Locality Features
--- ------------------------------------------------------------
-
-CREATE TABLE feature_store.locality_feature (
+CREATE TABLE IF NOT EXISTS feature_store.locality_feature (
     locality_feature_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     locality_id UUID NOT NULL,
@@ -30,8 +30,8 @@ CREATE TABLE feature_store.locality_feature (
         CHECK (LENGTH(TRIM(feature_name)) > 0)
 );
 
-CREATE INDEX idx_locality_feature_locality
+CREATE INDEX IF NOT EXISTS idx_locality_feature_locality
     ON feature_store.locality_feature(locality_id);
 
-CREATE INDEX idx_locality_feature_name
+CREATE INDEX IF NOT EXISTS idx_locality_feature_name
     ON feature_store.locality_feature(feature_name);
