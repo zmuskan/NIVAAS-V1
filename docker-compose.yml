@@ -17,9 +17,10 @@ services:
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./db/schema/init.sql:/docker-entrypoint-initdb.d/000_init.sql
-      - ./db/sql:/docker-entrypoint-initdb.d/sql
-      
+
+      # Database initialization scripts
+      - ./db/schema:/docker-entrypoint-initdb.d
+
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 10s
@@ -33,8 +34,6 @@ services:
 volumes:
   postgres_data:
 
-
 networks:
   nivaas-network:
     driver: bridge
-
