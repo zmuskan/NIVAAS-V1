@@ -38,3 +38,4 @@ class Settings:
                 os.getenv("OVERPASS_BACKOFF_SECONDS", "2")
             ),
         )
+settings = Settings.from_env()

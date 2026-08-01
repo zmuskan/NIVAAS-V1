@@ -1,8 +1,10 @@
-from pydantic import BaseModel
 from typing import Optional
+
+from pydantic import BaseModel
 
 
 class RawRentalListing(BaseModel):
+
     source_name: str
     external_listing_id: str
 
@@ -10,7 +12,9 @@ class RawRentalListing(BaseModel):
     description: Optional[str] = None
 
     property_type: Optional[str] = None
+
     bhk: Optional[int] = None
+    bathrooms: Optional[int] = None
 
     rent_amount: Optional[float] = None
     deposit_amount: Optional[float] = None

@@ -4,16 +4,33 @@ from .models import RawRentalListing
 
 
 class RentalParser:
-    """Parse Bangalore rental CSV rows."""
+    """Parse Bangalore rental CSV rows into RawRentalListing."""
+
+    @staticmethod
+    def _to_int(value):
+        if value is None:
+            return None
+
+        match = re.search(r"\d+", str(value))
+        return int(match.group()) if match else None
+
+    @staticmethod
+    def _to_float(value):
+        if value is None:
+            return None
+
+        value = str(value).replace(",", "").strip()
+
+        if value == "":
+            return None
+
+        try:
+            return float(value)
+        except ValueError:
+            return None
 
     @staticmethod
     def parse(row: dict) -> RawRentalListing:
-
-        rent = float(str(row["price"]).replace(",", ""))
-
-        bathrooms = int(
-            re.search(r"\d+", row["bathroom"]).group()
-        )
 
         return RawRentalListing(
 
@@ -25,21 +42,23 @@ class RentalParser:
 
             description=None,
 
-            property_type=row["property_type"],
+            property_type=row.get("property_type"),
 
-            bhk=int(row["bedroom"]),
+            bhk=RentalParser._to_int(row.get("bedroom")),
 
-            rent_amount=rent,
+            bathrooms=RentalParser._to_int(row.get("bathroom")),
+
+            rent_amount=RentalParser._to_float(row.get("price")),
 
             deposit_amount=None,
 
             maintenance_amount=None,
 
-            furnishing_status=row["furnish_type"],
+            furnishing_status=row.get("furnish_type"),
 
-            area_sqft=float(row["area"]),
+            area_sqft=RentalParser._to_float(row.get("area")),
 
-            locality=row["locality"],
+            locality=row.get("locality"),
 
             latitude=None,
 

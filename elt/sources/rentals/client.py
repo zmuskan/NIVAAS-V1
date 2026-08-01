@@ -1,9 +1,18 @@
-from abc import ABC, abstractmethod
+import csv
+from pathlib import Path
 
 
-class RentalSourceClient(ABC):
+class RentalSourceClient:
 
-    @abstractmethod
+    def __init__(self, path: str):
+        self.path = Path(path)
+
     def fetch(self):
-        """Fetch raw rental listings."""
-        raise NotImplementedError
+
+        with self.path.open(
+            mode="r",
+            encoding="utf-8",
+            newline=""
+        ) as file:
+
+            return list(csv.DictReader(file))

@@ -1,5 +1,16 @@
+from .client import RentalSourceClient
+from .pipeline import RentalPipeline
+
+
 def main():
-    print("Rental ingestion pipeline initialized.")
+
+    client = RentalSourceClient(
+        "data/raw/rentals/Bangalore_rent.csv"
+    )
+
+    pipeline = RentalPipeline(client)
+
+    pipeline.run()
 
 
 if __name__ == "__main__":
