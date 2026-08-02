@@ -8,7 +8,7 @@ and determining whether a record is eligible for transformation and
 persistence into staging.staging_listing.
 
 Validation rules (per project spec):
-    - rent must be present and > 0
+    - rent_amount must be present and > 0
     - area_sqft must be present and > 0
     - bhk must be present and > 0
     - locality must be present (non-empty string)
@@ -114,8 +114,15 @@ def safe_int(value: Any) -> Optional[int]:
 class RawListingValidator:
     """Validates a single raw_listing payload against NIVAAS staging rules."""
 
-    REQUIRED_STRING_FIELDS: tuple[str, ...] = ("locality", "property_type")
-    REQUIRED_POSITIVE_NUMERIC_FIELDS: tuple[str, ...] = ( "price","area","bedroom")
+    REQUIRED_STRING_FIELDS: tuple[str, ...] = (
+        "locality",
+        "property_type",
+    )
+    REQUIRED_POSITIVE_NUMERIC_FIELDS: tuple[str, ...] = (
+        "rent_amount",
+        "area_sqft",
+        "bhk",
+    )
     @classmethod
     def validate(cls, raw_listing_id: UUID, payload: dict[str, Any]) -> ValidationResult:
         result = ValidationResult(raw_listing_id=raw_listing_id, is_valid=True)

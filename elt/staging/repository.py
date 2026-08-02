@@ -78,7 +78,25 @@ class StagingRepository:
                     %s
                 )
                 ON CONFLICT (raw_listing_id)
-                DO NOTHING;
+                DO UPDATE
+                SET
+                    scrape_run_id = EXCLUDED.scrape_run_id,
+                    external_listing_id = EXCLUDED.external_listing_id,
+                    property_type = EXCLUDED.property_type,
+                    bhk = EXCLUDED.bhk,
+                    bathrooms = EXCLUDED.bathrooms,
+                    rent_amount = EXCLUDED.rent_amount,
+                    deposit_amount = EXCLUDED.deposit_amount,
+                    maintenance_amount = EXCLUDED.maintenance_amount,
+                    furnishing_status = EXCLUDED.furnishing_status,
+                    area_sqft = EXCLUDED.area_sqft,
+                    locality = EXCLUDED.locality,
+                    latitude = EXCLUDED.latitude,
+                    longitude = EXCLUDED.longitude,
+                    listing_url = EXCLUDED.listing_url,
+                    validation_status = 'VALID',
+                    validation_errors = NULL,
+                    transformed_at = EXCLUDED.transformed_at;
                 """,
                 (
                     listing.raw_listing_id,
