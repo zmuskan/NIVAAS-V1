@@ -56,16 +56,23 @@ class ListingTransformer:
 
         locality = cls._normalize_plain_string(payload.get("locality"))
         property_type = cls._normalize_upper_string(payload.get("property_type"))
-        furnishing_status = cls._normalize_upper_string(payload.get("furnish_type"))
+        furnishing_status = cls._normalize_upper_string(
+            payload.get("furnishing_status")
+        )
 
-        bhk = safe_int(payload.get("bedroom"))
-        bathrooms = safe_int(payload.get("bathroom"))
+        bhk = safe_int(payload.get("bhk"))
+        bathrooms = safe_int(payload.get("bathrooms"))
 
-        area_sqft = safe_float(payload.get("area"))
+        area_sqft = safe_float(payload.get("area_sqft"))
 
-        rent_amount = safe_float(payload.get("price"))
-        deposit_amount = safe_float(payload.get("deposit"))
-        maintenance_amount = safe_float(payload.get("maintenance"))
+        rent_amount = safe_float(payload.get("rent_amount"))
+
+        # Dataset stores some luxury rents in lakhs instead of rupees.
+        # Normalize everything to rupees.
+        if rent_amount is not None and 0 < rent_amount <= 5:
+            rent_amount *= 100000
+        deposit_amount = safe_float(payload.get("deposit_amount"))
+        maintenance_amount = safe_float(payload.get("maintenance_amount"))
 
         latitude = safe_float(payload.get("latitude"))
         longitude = safe_float(payload.get("longitude"))
