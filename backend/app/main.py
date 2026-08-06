@@ -11,6 +11,8 @@ from backend.app.database import check_connection, close_pool, init_pool
 from backend.app.api.locality import router as locality_router
 from backend.app.api.analytics import router as analytics_router
 from backend.app.api.property import router as property_router
+from backend.app.api.recommendation import router as recommendation_router
+from backend.app.api.similar import router as similar_router
 
 logging.basicConfig(
     level=settings.LOG_LEVEL,
@@ -76,4 +78,8 @@ app.include_router(locality_router)
 app.include_router(analytics_router)
 
 app.include_router(property_router)
+
+app.include_router(recommendation_router)
+
+app.include_router(similar_router)
 # -----------------------------------------------------

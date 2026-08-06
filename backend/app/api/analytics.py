@@ -65,3 +65,9 @@ def get_locality_analytics(
             status_code=404,
             detail=str(exc),
         ) from exc
+
+@router.get("/top-rent")
+def top_rent(
+    service: AnalyticsService = Depends(get_analytics_service),
+):
+    return service.top_rent_localities()

@@ -85,3 +85,40 @@ class AnalyticsRepository:
             cur.execute(query, (limit,))
 
             return cur.fetchall()
+
+    def top_rent_localities(self):
+
+        query = """
+        SELECT
+
+            l.name,
+
+            ROUND(
+                AVG(li.rent_amount),
+                2
+            ) average_rent,
+
+            COUNT(*) property_count
+
+        FROM core.property p
+
+        JOIN core.locality l
+            ON l.locality_id=p.locality_id
+
+        JOIN core.listing li
+            ON li.property_id=p.property_id
+
+        GROUP BY l.name
+
+        HAVING COUNT(*)>=3
+
+        ORDER BY average_rent DESC
+
+        LIMIT 20;
+        """
+
+        with self._conn.cursor(row_factory=dict_row) as cur:
+
+            cur.execute(query)
+
+            return cur.fetchall()

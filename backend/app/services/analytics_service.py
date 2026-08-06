@@ -70,3 +70,6 @@ class AnalyticsService:
             ],
             total=len(rows),
         )
+    def top_rent_localities(self):
+
+        return self.repository.top_rent_localities()
