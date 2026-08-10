@@ -109,24 +109,7 @@ def generate_locality_features():
                 GROUP BY locality_id;
             """)
 
-            print("metro_count")
-
-            cur.execute("""
-                INSERT INTO feature_store.locality_feature
-                (
-                    locality_id,
-                    feature_name,
-                    feature_value
-                )
-                SELECT
-                    locality_id,
-                    'metro_count',
-                    COUNT(*)::DOUBLE PRECISION
-                FROM core.amenity
-                WHERE amenity_type='metro'
-                AND locality_id IS NOT NULL
-                GROUP BY locality_id;
-            """)
+            print("metro_count skipped")
 
         conn.commit()
 
