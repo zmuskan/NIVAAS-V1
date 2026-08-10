@@ -1,54 +1,90 @@
-from __future__ import annotations
+from fastapi import APIRouter
 
-from uuid import UUID
-
-from fastapi import APIRouter, Depends, HTTPException, Query
-
-from backend.app.dependencies import get_db_connection
-from backend.app.repositories.locality_repository import LocalityRepository
-from backend.app.services.locality_service import LocalityService
+from backend.app.database import get_connection
 
 router = APIRouter(
     prefix="/localities",
-    tags=["Localities"],
+    tags=["localities"],
 )
 
 
-def get_locality_service(
-    conn=Depends(get_db_connection),
-) -> LocalityService:
+@router.get("/{locality_name}")
+def get_locality(locality_name: str):
 
-    repository = LocalityRepository(conn)
+    with get_connection() as conn:
+        with conn.cursor() as cur:
 
-    return LocalityService(repository)
+            cur.execute(
+                """
+                SELECT
 
+                    l.name,
 
-@router.get("")
-def list_localities(
-    limit: int = Query(default=50, ge=1, le=500),
-    offset: int = Query(default=0, ge=0),
-    service: LocalityService = Depends(get_locality_service),
-):
+                    MAX(
+                        CASE
+                            WHEN f.feature_name='min_rent'
+                            THEN f.feature_value
+                        END
+                    ) AS min_rent,
 
-    return service.list_localities(
-        limit=limit,
-        offset=offset,
-    )
+                    MAX(
+                        CASE
+                            WHEN f.feature_name='avg_rent'
+                            THEN f.feature_value
+                        END
+                    ) AS avg_rent,
 
+                    MAX(
+                        CASE
+                            WHEN f.feature_name='max_rent'
+                            THEN f.feature_value
+                        END
+                    ) AS max_rent,
 
-@router.get("/{locality_id}")
-def get_locality(
-    locality_id: UUID,
-    service: LocalityService = Depends(get_locality_service),
-):
+                    MAX(
+                        CASE
+                            WHEN f.feature_name='listing_count'
+                            THEN f.feature_value
+                        END
+                    ) AS listing_count,
 
-    try:
+                    MAX(
+                        CASE
+                            WHEN f.feature_name='property_count'
+                            THEN f.feature_value
+                        END
+                    ) AS property_count,
 
-        return service.get_locality(locality_id)
+                    MAX(
+                        CASE
+                            WHEN f.feature_name='metro_count'
+                            THEN f.feature_value
+                        END
+                    ) AS metro_count
 
-    except ValueError as exc:
+                FROM core.locality l
 
-        raise HTTPException(
-            status_code=404,
-            detail=str(exc),
-        ) from exc
+                LEFT JOIN feature_store.locality_feature f
+                    ON l.locality_id = f.locality_id
+
+                WHERE l.name ILIKE %s
+
+                GROUP BY l.name
+                """,
+                (locality_name,)
+            )
+
+            row = cur.fetchone()
+
+            if row is None:
+                return {"error": "Locality not found"}
+
+            return {
+                "name": row[0],
+                "min_rent": row[1],
+                "avg_rent": row[2],
+                "max_rent": row[3],
+                "listing_count": row[4],
+                "property_count": row[5],
+                "metro_count": row[6]
+            }

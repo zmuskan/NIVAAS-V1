@@ -1,40 +1,30 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter
 
-from backend.app.dependencies import get_db_connection
-from backend.app.repositories.recommendation_repository import RecommendationRepository
-from backend.app.schemas.recommendation import RecommendationListResponse
-from backend.app.services.recommendation_service import RecommendationService
+from backend.app.schemas.recommendation_request import (
+    RecommendationRequest,
+)
+
+from backend.app.recommendation.weighted_ranking import (
+    recommend,
+)
 
 router = APIRouter(
-    prefix="/recommendations",
-    tags=["Recommendations"],
+    prefix="/recommend",
+    tags=["recommendation"],
 )
 
 
-def get_service(
-    conn=Depends(get_db_connection),
+@router.post("")
+def get_recommendations(
+    request: RecommendationRequest,
 ):
 
-    return RecommendationService(
-        RecommendationRepository(conn)
+    rows = recommend(
+        rent_weight=request.rent_weight,
+        metro_weight=request.metro_weight,
+        property_weight=request.property_weight,
     )
 
-
-@router.get("", response_model=RecommendationListResponse)
-def recommend(
-
-    budget: float = Query(..., gt=0),
-
-    bhk: int | None = None,
-
-    limit: int = Query(10, ge=1, le=50),
-
-    service: RecommendationService = Depends(get_service),
-
-):
-
-    return service.recommend(
-        budget=budget,
-        bhk=bhk,
-        limit=limit,
-    )
+    return {
+        "recommendations": rows
+    }
