@@ -1,7 +1,8 @@
-import RecommendationsPage from "./pages/RecommendationsPage";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./router";
 
 function App() {
-  return <RecommendationsPage />;
+  return <RouterProvider router={router} />;
 }
 
 export default App;

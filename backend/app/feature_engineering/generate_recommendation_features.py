@@ -14,6 +14,15 @@ def generate_recommendation_features():
         with get_connection() as conn:
             with conn.cursor() as cur:
 
+                cur.execute("""
+                    DELETE FROM feature_store.locality_feature
+                    WHERE feature_name IN
+                    (
+                        'rent_score',
+                        'inventory_score'
+                    );
+                """)
+
                 print("rent_score")
 
                 cur.execute("""
@@ -43,7 +52,7 @@ def generate_recommendation_features():
                 WHERE feature_name='avg_rent';
                 """)
 
-                print("metro_score")
+                print("inventory_score")
 
                 cur.execute("""
                 INSERT INTO feature_store.locality_feature
@@ -54,13 +63,13 @@ def generate_recommendation_features():
                 )
                 SELECT
                     locality_id,
-                    'metro_score',
+                    'inventory_score',
                     LEAST(
-                        feature_value * 25,
+                        feature_value * 3,
                         100
                     )
                 FROM feature_store.locality_feature
-                WHERE feature_name='metro_count';
+                WHERE feature_name='listing_count';
                 """)
 
             conn.commit()

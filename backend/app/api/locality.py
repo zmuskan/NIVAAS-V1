@@ -57,10 +57,24 @@ def get_locality(locality_name: str):
 
                     MAX(
                         CASE
-                            WHEN f.feature_name='metro_count'
+                            WHEN f.feature_name='overall_score'
                             THEN f.feature_value
                         END
-                    ) AS metro_count
+                    ) AS overall_score,
+
+                    MAX(
+                        CASE
+                            WHEN f.feature_name='inventory_score'
+                            THEN f.feature_value
+                        END
+                    ) AS inventory_score,
+
+                    MAX(
+                        CASE
+                            WHEN f.feature_name='density_score'
+                            THEN f.feature_value
+                        END
+                    ) AS density_score
 
                 FROM core.locality l
 
@@ -86,5 +100,7 @@ def get_locality(locality_name: str):
                 "max_rent": row[3],
                 "listing_count": row[4],
                 "property_count": row[5],
-                "metro_count": row[6]
+                "overall_score": row[6],
+                "inventory_score": row[7],
+                "density_score": row[8],
             }

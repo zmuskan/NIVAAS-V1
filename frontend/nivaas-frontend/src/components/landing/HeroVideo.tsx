@@ -11,7 +11,7 @@ export default function HeroVideo() {
                 <source src="/videos/hero-bg.mp4" type="video/mp4" />
             </video>
 
-            <div className="absolute inset-0 bg-[#0B0D11]/55" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/55 to-black/70" />
         </div>
     );
 }

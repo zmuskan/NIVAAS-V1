@@ -18,7 +18,7 @@ class LocalityResponse(BaseModel):
     listing_count: int | None = None
     property_count: int | None = None
 
-    metro_count: float | None = None
+    
 
 
 class LocalityListResponse(BaseModel):

@@ -1,11 +1,17 @@
 from fastapi import APIRouter
 
-from backend.app.schemas.recommendation_request import (
-    RecommendationRequest,
+from backend.app.database import get_connection
+
+from backend.app.repositories.recommendation_repository import (
+    RecommendationRepository,
 )
 
-from backend.app.recommendation.weighted_ranking import (
-    recommend,
+from backend.app.services.recommendation_service import (
+    RecommendationService,
+)
+
+from backend.app.schemas.recommendation_request import (
+    RecommendationRequest,
 )
 
 router = APIRouter(
@@ -19,12 +25,30 @@ def get_recommendations(
     request: RecommendationRequest,
 ):
 
-    rows = recommend(
-        rent_weight=request.rent_weight,
-        metro_weight=request.metro_weight,
-        property_weight=request.property_weight,
+    budget_map = {
+        "Below 15k": 15000,
+        "15k-25k": 25000,
+        "25k-40k": 40000,
+        "40k+": 100000,
+    }
+
+    budget = budget_map.get(
+        request.budget,
+        25000,
     )
 
-    return {
-        "recommendations": rows
-    }
+    with get_connection() as conn:
+
+        repository = RecommendationRepository(conn)
+
+        service = RecommendationService(
+            repository=repository,
+        )
+
+        result = service.recommend(
+            budget=budget,
+            bhk=None,
+            limit=10,
+        )
+
+        return result

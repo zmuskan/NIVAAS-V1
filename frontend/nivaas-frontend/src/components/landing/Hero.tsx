@@ -38,26 +38,12 @@ const Hero = () => {
                             transition={{ duration: 0.8 }}
                         >
                             <h1
-                                className="
-                                    text-7xl
-                                    md:text-9xl
-                                    font-light
-                                    tracking-[0.08em]
-                                    text-white
-                                "
+                                className="text-4xl md:text-5xl font-light tracking-[0.06em] text-white"
                             >
                                 NIVAAS
                             </h1>
 
-                            <p
-                                className="
-                                    mt-4
-                                    text-xl
-                                    md:text-2xl
-                                    text-white/80
-                                    font-light
-                                "
-                            >
+                            <p className="mt-3 text-base md:text-lg text-white/80 font-light">
                                 Find where you belong
                             </p>
                         </motion.div>
@@ -68,27 +54,22 @@ const Hero = () => {
                             animate={{ opacity: 1 }}
                             transition={{ duration: 1 }}
                         >
-                            <h1 className="flex flex-col text-white text-[2.75rem] md:text-[4.5rem] font-medium leading-[1.05]">
-                                <span>Every locality</span>
-                                <span>has a personality.</span>
-                                <span>
-                                    Let's find
-                                    <span className="text-[#D6B46C]"> yours.</span>
-                                </span>
+                            <h1 className="flex flex-col text-white text-3xl md:text-4xl font-medium leading-[1.05]">
+                                <span>Find where you belong.</span>
+                                <span>Five questions.</span>
+                                <span>One neighbourhood that feels like home.</span>
                             </h1>
 
-                            <p className="mt-8 text-lg text-white/75">
-                                A couple of questions.
-                                <br />
-                                Then we'll do the hard part.
+                            <p className="mt-6 text-base md:text-lg text-white/75 font-light">
+                                Elegant, quick, and grounded in real inventory.
                             </p>
 
-                            <div className="mt-10">
+                            <div className="mt-8">
                                 <button
                                     onClick={() => navigate("/questionnaire")}
-                                    className="rounded-full bg-white text-black px-8 py-4"
+                                    className="rounded-full border border-white/20 bg-black/40 backdrop-blur-md text-white hover:bg-black/60 transition-all px-10 py-4"
                                 >
-                                    Get Started
+                                    Begin Journey
                                 </button>
                             </div>
                         </motion.div>

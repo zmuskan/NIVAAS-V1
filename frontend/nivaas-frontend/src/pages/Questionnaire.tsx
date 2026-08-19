@@ -1,11 +1,5 @@
-import AppBackground from "@/components/layout/AppBackground";
-import NivChat from "@/components/chat/NivChat";
+import NivaasExperience from "./NivaasExperience";
 
 export default function Questionnaire() {
-    return (
-        <>
-            <AppBackground />
-            <NivChat />
-        </>
-    );
+    return <NivaasExperience />;
 }

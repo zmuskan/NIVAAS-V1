@@ -1,29 +1,42 @@
 type Props = {
     locality: string;
     score: number;
+    reasons: string[];
 };
 
 export default function RecommendationCard({
     locality,
+    score,
+    reasons,
 }: Props) {
+
     return (
         <div
-            style={{
-                border: "1px solid #333",
-                borderRadius: "16px",
-                padding: "20px",
-                marginBottom: "12px",
-            }}
+            className="
+                rounded-3xl
+                border
+                border-white/10
+                bg-white/5
+                backdrop-blur-xl
+                p-6
+                mb-4
+            "
         >
-            <h2>{locality} ⭐</h2>
+            <h2 className="text-3xl font-semibold">
+                {locality}
+            </h2>
 
-            <p>Good rental inventory</p>
+            <p className="mt-2 text-emerald-300">
+                Match Score: {score}
+            </p>
 
-            <p>Affordable for your budget</p>
-
-            <button>
-                Explore Area
-            </button>
+            <div className="mt-4 space-y-2">
+                {reasons.map((reason) => (
+                    <p key={reason}>
+                        • {reason}
+                    </p>
+                ))}
+            </div>
         </div>
     );
 }

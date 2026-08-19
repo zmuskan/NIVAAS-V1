@@ -32,18 +32,28 @@ def generate_overall_scores():
                     feature_value
                 )
                 SELECT
-                    r.locality_id,
+                    d.locality_id,
                     'overall_score',
+
                     (
-                        COALESCE(r.feature_value, 0) * 0.70
+                        COALESCE(d.feature_value, 0) * 0.40
                         +
-                        COALESCE(m.feature_value, 0) * 0.30
+                        COALESCE(i.feature_value, 0) * 0.40
+                        +
+                        COALESCE(ds.feature_value, 0) * 0.20
                     )
-                FROM feature_store.locality_feature r
-                LEFT JOIN feature_store.locality_feature m
-                    ON r.locality_id = m.locality_id
-                    AND m.feature_name = 'metro_score'
-                WHERE r.feature_name = 'rent_score';
+
+                FROM feature_store.locality_feature d
+
+                LEFT JOIN feature_store.locality_feature i
+                    ON d.locality_id = i.locality_id
+                    AND i.feature_name = 'inventory_score'
+
+                LEFT JOIN feature_store.locality_feature ds
+                    ON d.locality_id = ds.locality_id
+                    AND ds.feature_name = 'density_score'
+
+                WHERE d.feature_name = 'family_score';
                 """)
 
             conn.commit()

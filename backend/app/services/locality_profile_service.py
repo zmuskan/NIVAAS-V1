@@ -17,5 +17,4 @@ def fetch_locality_profile(locality_name: str):
         "max_rent": row[3],
         "listing_count": row[4],
         "property_count": row[5],
-        "metro_count": row[6],
     }

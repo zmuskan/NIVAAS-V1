@@ -19,39 +19,31 @@ class RecommendationRepository:
         query = """
         SELECT
 
-            p.property_id,
-            p.locality_id,
-            l.name AS locality_name,
+            l.name AS locality,
 
-            p.property_type,
-            p.bhk,
-            p.area_sqft,
-            p.furnishing_status,
+            ROUND(MIN(li.rent_amount)) AS min_rent,
 
-            li.rent_amount,
+            ROUND(AVG(li.rent_amount)) AS avg_rent,
 
-            la.listing_count,
-            la.avg_rent,
-            la.avg_rent_per_sqft,
-            la.apartment_pct,
-            la.independent_house_pct,
-            la.villa_pct
+            ROUND(MAX(li.rent_amount)) AS max_rent,
+
+            COUNT(*) AS listing_count
 
         FROM core.property p
 
         JOIN core.locality l
-            ON l.locality_id=p.locality_id
+            ON l.locality_id = p.locality_id
 
         JOIN core.listing li
-            ON li.property_id=p.property_id
+            ON li.property_id = p.property_id
 
-        LEFT JOIN analytics.locality_summary la
-            ON la.locality_id=p.locality_id
+        WHERE li.rent_amount <= %s
 
-        WHERE li.rent_amount<=%s
+        GROUP BY l.name
         """
 
         with self._conn.cursor(row_factory=dict_row) as cur:
 
             cur.execute(query, (budget,))
+
             return cur.fetchall()
