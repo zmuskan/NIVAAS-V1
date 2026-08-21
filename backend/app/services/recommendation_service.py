@@ -17,66 +17,136 @@ class RecommendationService:
         self.repository = repository
 
     def recommend(
-        self,
-        budget: float,
+    self,
+    min_budget: float,
+    max_budget: float,
+        work: str,
+        priority: str,
+        lifestyle: str,
         bhk: int | None,
         limit: int,
     ) -> LocalityRecommendationListResponse:
 
-        rows = self.repository.fetch_candidates(budget)
+        rows = self.repository.fetch_candidates(
+            min_budget,
+            max_budget,
+        )
+        print("BUDGET RECEIVED:", min_budget, max_budget)
 
-        recommendations = []
-
-        for row in rows:
-
-            avg_rent = float(row["avg_rent"])
-            listing_count = int(row["listing_count"])
-
-            score = 0
-
-            # Budget fit
-
-            if avg_rent <= budget:
-                score += 60
-
-            else:
-                difference = avg_rent - budget
-
-                score += max(
-                    0,
-                    60 - (difference / budget) * 60,
-                )
-
-            # Availability
-
-            score += min(
-                listing_count * 2,
-                40,
+        for row in rows[:10]:
+            print(
+                row["locality"],
+                row["avg_rent"]
             )
 
-            score = round(
-                min(score, 100),
+        shortlisted = []
+
+        #################################################
+        # FILTER STAGE
+        #################################################
+
+        shortlisted = rows
+
+        #################################################
+        # SCORING STAGE
+        #################################################
+
+        scored_items = []
+
+        for row in shortlisted:
+
+            locality = row["locality"]
+
+            avg_rent = float(row["avg_rent"])
+
+            listing_count = int(row["listing_count"])
+
+            #############################################
+            # Affordability Score
+            #############################################
+
+            mid_budget = (min_budget + max_budget) / 2
+
+            affordability_score = max(
+                0,
+                100 - (avg_rent / mid_budget) * 100,
+            )
+            #############################################
+            # Availability Score
+            #############################################
+
+            availability_score = min(
+                listing_count * 5,
+                100,
+            )
+
+            #############################################
+            # Workplace Score
+            #############################################
+
+            workplace_score = 50
+
+            #############################################
+            # Lifestyle Score
+            #############################################
+
+            lifestyle_score = 50
+            #############################################
+            # Final Score
+            #############################################
+
+            final_score = round(
+                (
+                    affordability_score * 0.60
+                    + availability_score * 0.20
+                    + workplace_score * 0.20
+                ),
                 2,
             )
 
-            recommendations.append(
-                LocalityRecommendationResponse(
-                    locality=row["locality"],
-                    min_rent=float(row["min_rent"]),
-                    avg_rent=float(row["avg_rent"]),
-                    max_rent=float(row["max_rent"]),
-                    listing_count=listing_count,
-                    match_reason=(
-                        "Fits your budget and offers strong rental availability"
+            #############################################
+            # Reason
+            #############################################
+
+            if workplace_score == 100:
+                reason = "Near workplace"
+
+            elif affordability_score > 70:
+                reason = "Affordable option"
+
+            elif availability_score > 60:
+                reason = "High availability"
+
+            else:
+                reason = "Balanced option"
+
+            scored_items.append(
+                {
+                    "score": final_score,
+                    "item": LocalityRecommendationResponse(
+                        locality=locality,
+                        min_rent=float(row["min_rent"]),
+                        avg_rent=float(row["avg_rent"]),
+                        max_rent=float(row["max_rent"]),
+                        listing_count=listing_count,
+                        match_reason=reason,
                     ),
-                )
+                }
             )
 
-        recommendations.sort(
-            key=lambda x: x.avg_rent,
+        #################################################
+        # SORT
+        #################################################
+
+        scored_items.sort(
+            key=lambda x: x["score"],
+            reverse=True,
         )
 
-        recommendations = recommendations[:limit]
+        recommendations = [
+            item["item"]
+            for item in scored_items[:limit]
+        ]
 
         return LocalityRecommendationListResponse(
             items=recommendations,

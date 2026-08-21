@@ -14,6 +14,7 @@ from backend.app.api.property import router as property_router
 from backend.app.api.recommendation import router as recommendation_router
 from backend.app.api.similar import router as similar_router
 from backend.app.api.locality_profile import router as locality_profile_router
+from backend.app.api.localities import router as localities_router
 
 logging.basicConfig(
     level=settings.LOG_LEVEL,
@@ -69,6 +70,17 @@ def health():
         "database": check_connection(),
     }
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # -----------------------------------------------------
 # Routers
@@ -79,10 +91,12 @@ app.include_router(locality_router)
 app.include_router(analytics_router)
 
 app.include_router(property_router)
-
+print("REGISTERING RECOMMEND ROUTER")
 app.include_router(recommendation_router)
+
 
 app.include_router(similar_router)
 
 app.include_router(locality_profile_router)
+app.include_router(localities_router)
 # -----------------------------------------------------

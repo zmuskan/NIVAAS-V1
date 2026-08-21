@@ -109,6 +109,41 @@ def generate_locality_features():
                 GROUP BY locality_id;
             """)
 
+            print("centroid_lat")
+
+            cur.execute("""
+                INSERT INTO feature_store.locality_feature
+                (
+                    locality_id,
+                    feature_name,
+                    feature_value
+                )
+                SELECT
+                    locality_id,
+                    'centroid_lat',
+                    AVG(latitude)::DOUBLE PRECISION
+                FROM core.property
+                WHERE latitude IS NOT NULL
+                GROUP BY locality_id;
+            """)
+
+            print("centroid_lon")
+
+            cur.execute("""
+                INSERT INTO feature_store.locality_feature
+                (
+                    locality_id,
+                    feature_name,
+                    feature_value
+                )
+                SELECT
+                    locality_id,
+                    'centroid_lon',
+                    AVG(longitude)::DOUBLE PRECISION
+                FROM core.property
+                WHERE longitude IS NOT NULL
+                GROUP BY locality_id;
+            """)
             print("metro_count skipped")
 
         conn.commit()

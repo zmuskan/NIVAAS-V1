@@ -3,7 +3,8 @@ import { createBrowserRouter } from "react-router-dom";
 import Landing from "@/routes/landing";
 import Questionnaire from "@/pages/Questionnaire";
 import Recommendations from "@/pages/Recommendations";
-import LocalityProfile from "@/pages/LocalityProfile";
+import LocalityProfilePage from "@/pages/LocalityProfilePage";
+import ExplorePage from "@/pages/ExplorePage";
 
 export const router = createBrowserRouter([
     {
@@ -22,7 +23,14 @@ export const router = createBrowserRouter([
     },
 
     {
-        path: "/locality/:slug",
-        element: <LocalityProfile />,
+
+    path: "/locality/:slug",
+    element: <LocalityProfilePage />,
+
+    },
+
+    {
+        path: "/explore",
+        element: <ExplorePage />,
     },
 ]);

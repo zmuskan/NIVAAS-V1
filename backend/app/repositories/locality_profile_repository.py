@@ -14,7 +14,8 @@ def get_locality_profile(locality_name: str):
                     lm.avg_rent,
                     lm.max_rent,
                     lm.listing_count,
-                    lm.property_count
+                    lm.avg_bhk,
+                    lm.avg_area_sqft
 
                 FROM analytics.locality_metrics lm
                 JOIN core.locality l

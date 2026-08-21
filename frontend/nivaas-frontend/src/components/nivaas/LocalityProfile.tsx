@@ -72,6 +72,7 @@ export function LocalityProfile({
     onBack: () => void;
 }) {
     const day = locality.dayInLife;
+    console.log("LOCALITY DATA", locality);
 
     return (
         <section className="min-h-screen pb-32">
@@ -120,14 +121,14 @@ export function LocalityProfile({
                         <div>
                             <p className="track-wide text-[0.5rem] text-muted-foreground">Average rent</p>
                             <p className="mt-2 text-3xl font-light text-foreground">
-                                {inr(locality.avgRent)}
+                                {locality.avgRent ? inr(locality.avgRent) : "N/A"}
                             </p>
                             <p className="mt-1 text-xs text-muted-foreground">2 BHK, semi-furnished</p>
                         </div>
                         <div>
                             <p className="track-wide text-[0.5rem] text-muted-foreground">Homes listed</p>
                             <p className="mt-2 text-3xl font-light text-foreground">
-                                {locality.listings.toLocaleString("en-IN")}
+                                {locality.listings?.toLocaleString("en-IN") ?? "0"}
                             </p>
                             <p className="mt-1 text-xs text-muted-foreground">
                                 Availability: {locality.availability.toLowerCase()}

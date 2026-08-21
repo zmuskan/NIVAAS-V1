@@ -13,12 +13,13 @@ class RecommendationRepository:
 
     def fetch_candidates(
         self,
-        budget: float,
+        min_budget: float,
+        max_budget: float,
     ) -> list[dict[str, Any]]:
 
         query = """
-        SELECT
 
+        SELECT
             l.name AS locality,
 
             ROUND(MIN(li.rent_amount)) AS min_rent,
@@ -37,13 +38,19 @@ class RecommendationRepository:
         JOIN core.listing li
             ON li.property_id = p.property_id
 
-        WHERE li.rent_amount <= %s
-
         GROUP BY l.name
+        HAVING AVG(li.rent_amount) BETWEEN %s AND %s
         """
+
 
         with self._conn.cursor(row_factory=dict_row) as cur:
 
-            cur.execute(query, (budget,))
+            cur.execute(
+                query,
+                (
+                    min_budget,
+                    max_budget,
+                ),
+            )
 
             return cur.fetchall()

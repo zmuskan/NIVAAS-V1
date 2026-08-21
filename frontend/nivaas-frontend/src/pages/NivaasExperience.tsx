@@ -1,37 +1,31 @@
-import { useMemo, useState } from "react";
-
 import { Journey } from "@/components/nivaas/Journey";
 import { Results } from "@/components/nivaas/Results";
-import { LocalityProfile } from "@/components/nivaas/LocalityProfile";
 import { NivBot } from "@/components/nivaas/NivBot";
+import { useEffect, useState } from "react";
+import { getRecommendations } from "@/api/recommend";
+import type { Answers } from "@/data/nivaas";
 
-import {
-    rankLocalities,
-    type Answers,
-    type Locality,
-} from "@/data/nivaas";
-
-type Stage = "journey" | "results" | "profile";
+type Stage = "journey" | "results";
 
 export default function NivaasExperience() {
     const [stage, setStage] = useState<Stage>("journey");
 
-    const [answers, setAnswers] =
-        useState<Answers>({
-            name: "",
-            priorities: [],
-        });
+    const [answers, setAnswers] = useState<Answers>({
+        name: "",
+        priorities: [],
+    });
 
-    const [locality, setLocality] =
-        useState<Locality | null>(null);
+    const [matches, setMatches] = useState<any[]>([]);
 
-    const matches = useMemo(
-        () =>
-            stage === "journey"
-                ? []
-                : rankLocalities(answers),
-        [stage, answers]
-    );
+    useEffect(() => {
+        if (stage !== "results") return;
+
+        getRecommendations(answers)
+            .then((data) => {
+                setMatches(data);
+            })
+            .catch(console.error);
+    }, [stage, answers]);
 
     return (
         <main className="min-h-screen bg-background">
@@ -48,26 +42,13 @@ export default function NivaasExperience() {
                 <Results
                     answers={answers}
                     matches={matches}
-                    onSelect={(l) => {
-                        setLocality(l);
-                        setStage("profile");
-                    }}
                     onRestart={() => {
                         setAnswers({
                             name: "",
                             priorities: [],
                         });
-                        setLocality(null);
-                        setStage("journey");
-                    }}
-                />
-            )}
 
-            {stage === "profile" && locality && (
-                <LocalityProfile
-                    locality={locality}
-                    onBack={() => {
-                        setStage("results");
+                        setStage("journey");
                     }}
                 />
             )}
