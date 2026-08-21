@@ -16,15 +16,42 @@ export default function LocalityProfilePage() {
 
         getLocality(slug).then((api) => {
 
+            if (!api.name) {
+                console.error("Locality not found:", slug);
+                return;
+            }
+
             const template = localities.find(
-                (l) => l.name.toLowerCase() === api.name.toLowerCase()
+                (l) =>
+                    l.name.toLowerCase() ===
+                    api.name.toLowerCase()
             );
 
             console.log("API =", api);
             console.log("TEMPLATE =", template);
 
             const merged = {
-                ...template,
+            name: api.name,
+            district: "Bangalore",
+            longBlurb: "Locality profile coming soon.",
+            availability: "Steady",
+
+            propertyTypes: [],
+            furnishing: [],
+            bhkMix: [],
+
+            nearby: [],
+
+            dayInLife: {
+                morning: "Data coming soon.",
+                workday: "Data coming soon.",
+                evening: "Data coming soon.",
+                weekend: "Data coming soon.",
+            },
+
+            imagine: [],
+
+            ...template,
 
                 avgRent: api.avg_rent,
                 listings: api.listing_count,
