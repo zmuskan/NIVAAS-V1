@@ -28,58 +28,116 @@ export default function LocalityProfilePage() {
                 );
 
                 const merged = {
-                    name: api.name,
-                    district: "Bangalore",
-
-                    longBlurb: `${api.name} is a locality in Bangalore.`,
-
-                    availability: "Available",
-
-                    propertyTypes: [],
-                    furnishing: [],
-                    bhkMix: [],
-
-                    nearby: [],
-
-                    clusters: [],
-
-                    coords: {
-                        x: 50,
-                        y: 50,
-                    },
-
-                    dayInLife: {
-                        morning: "Data coming soon.",
-                        workday: "Data coming soon.",
-                        evening: "Data coming soon.",
-                        weekend: "Data coming soon.",
-                    },
-
-                    imagine: [],
-
                     ...template,
 
-                    avgRent: Number(api.avg_rent ?? 0),
-                    listings: Number(api.listing_count ?? 0),
+                    name: api.name,
 
-                    overallScore: Number(api.overall_score ?? 0),
-                    inventoryScore: Number(api.inventory_score ?? 0),
-                    densityScore: Number(api.density_score ?? 0),
+                    district:
+                        template?.district ?? "Bangalore",
+
+                    longBlurb:
+                        template?.longBlurb ??
+                        `${api.name} is a locality in Bangalore.`,
+
+                    availability:
+                        template?.availability ?? "Available",
+
+                    propertyTypes:
+                        template?.propertyTypes ?? [],
+
+                    furnishing:
+                        template?.furnishing ?? [],
+
+                    bhkMix:
+                        template?.bhkMix ?? [],
+
+                    nearby:
+                        template?.nearby ?? [],
+
+                    clusters:
+                        template?.clusters ?? [],
+
+                    coords:
+                        template?.coords ?? {
+                            x: 50,
+                            y: 50,
+                        },
+
+                    dayInLife:
+                        template?.dayInLife ?? {
+                            morning: "Data coming soon.",
+                            workday: "Data coming soon.",
+                            evening: "Data coming soon.",
+                            weekend: "Data coming soon.",
+                        },
+
+                    imagine:
+                        template?.imagine ?? [],
+
+                    // --------------------------------
+                    // API / DATABASE VALUES
+                    // --------------------------------
+
+                    avgRent: Number(
+                        api.avg_rent ?? 0
+                    ),
+
+                    listings: Number(
+                        api.listing_count ?? 0
+                    ),
+
+                    overallScore:
+                        api.overall_score !== null &&
+                            api.overall_score !== undefined
+                            ? Number(api.overall_score)
+                            : null,
+
+                    inventoryScore:
+                        api.inventory_score !== null &&
+                            api.inventory_score !== undefined
+                            ? Number(api.inventory_score)
+                            : null,
+
+                    densityScore:
+                        api.density_score !== null &&
+                            api.density_score !== undefined
+                            ? Number(api.density_score)
+                            : null,
 
                     rentRange:
-                        api.min_rent && api.max_rent
-                            ? `₹${Number(api.min_rent).toLocaleString(
+                        api.min_rent !== null &&
+                            api.min_rent !== undefined &&
+                            api.max_rent !== null &&
+                            api.max_rent !== undefined
+                            ? `₹${Number(
+                                api.min_rent
+                            ).toLocaleString(
                                 "en-IN"
-                            )} – ₹${Number(api.max_rent).toLocaleString(
+                            )} – ₹${Number(
+                                api.max_rent
+                            ).toLocaleString(
                                 "en-IN"
                             )}`
                             : "N/A",
                 };
 
+                console.log(
+                    "API LOCALITY =",
+                    api
+                );
+
+                console.log(
+                    "MERGED LOCALITY =",
+                    merged
+                );
+
                 setLocality(merged);
             })
             .catch((err) => {
-                console.error(err);
+                console.error(
+                    "Failed to load locality:",
+                    err
+                );
             });
     }, [slug]);
 
