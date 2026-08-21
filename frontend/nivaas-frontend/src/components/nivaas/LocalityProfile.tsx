@@ -143,6 +143,35 @@ export function LocalityProfile({
                         </div>
                     </div>
 
+                    <div className="mt-10 grid gap-6 sm:grid-cols-3">
+                        <div>
+                            <p className="text-xs text-muted-foreground">
+                                Overall Score
+                            </p>
+                            <p className="text-3xl font-light">
+                                {locality.overallScore ?? "N/A"}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p className="text-xs text-muted-foreground">
+                                Inventory Score
+                            </p>
+                            <p className="text-3xl font-light">
+                                {locality.inventoryScore ?? "N/A"}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p className="text-xs text-muted-foreground">
+                                Density Score
+                            </p>
+                            <p className="text-3xl font-light">
+                                {locality.densityScore ?? "N/A"}
+                            </p>
+                        </div>
+                    </div>
+
                     <div className="mt-10 grid gap-9 md:grid-cols-3">
                         <div>
                             <p className="track-wide text-[0.5rem] text-muted-foreground">Property types</p>

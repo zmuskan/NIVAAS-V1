@@ -66,6 +66,9 @@ export type Locality = {
     avgRent: number;
     rentRange: string;
     listings: number;
+    overallScore?: number;
+    inventoryScore?: number;
+    densityScore?: number;
     availability: "Limited" | "Steady" | "Strong" | "Very strong";
     propertyTypes: { label: string; share: number }[];
     furnishing: { label: string; share: number }[];

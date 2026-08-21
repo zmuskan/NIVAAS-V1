@@ -150,7 +150,7 @@ def get_locality(locality_name: str):
                             WHEN f.feature_name='centroid_lon'
                             THEN f.feature_value
                         END
-                    ) AS centroid_lon,
+                    ) AS centroid_lon
 
                 FROM core.locality l
 

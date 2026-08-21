@@ -55,6 +55,10 @@ export default function LocalityProfilePage() {
                     avgRent: Number(api.avg_rent ?? 0),
                     listings: Number(api.listing_count ?? 0),
 
+                    overallScore: api.overall_score,
+                    inventoryScore: api.inventory_score,
+                    densityScore: api.density_score,
+
                     rentRange:
                         api.min_rent && api.max_rent
                             ? `₹${Number(
