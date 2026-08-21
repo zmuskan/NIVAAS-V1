@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * NIVAAS — global design foundation
+ * shadcn/ui components read colors through these CSS variables (HSL triplets),
+ * so this bridges the Tailwind token system in tailwind.config.ts to shadcn.
+ * Dark mode is the primary console experience; light mode ("document mode")
+ * is a full mirror, not an afterthought.
+ */
+@layer base {
+  :root {
+    /* shadcn bridge — light ("paper/document") mode */
+    --background: 220 20% 98%;
+    --foreground: 220 25% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 8%;
+    --primary: 156 59% 30%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 94%;
+    --secondary-foreground: 220 25% 8%;
+    --muted: 220 14% 94%;
+    --muted-foreground: 220 9% 40%;
+    --accent: 42 51% 55%;
+    --accent-foreground: 220 25% 8%;
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 20% 90%;
+    --input: 220 20% 90%;
+    --ring: 156 59% 30%;
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    /* shadcn bridge — dark ("console") mode, default */
+    --background: 220 26% 6%;
+    --foreground: 220 20% 95%;
+    --card: 222 24% 9%;
+    --card-foreground: 220 20% 95%;
+    --popover: 220 24% 10%;
+    --popover-foreground: 220 20% 95%;
+    --primary: 156 59% 30%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 18% 14%;
+    --secondary-foreground: 220 20% 95%;
+    --muted: 220 18% 14%;
+    --muted-foreground: 220 10% 65%;
+    --accent: 42 51% 55%;
+    --accent-foreground: 220 25% 8%;
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 20% 100% / 0.08;
+    --input: 220 20% 100% / 0.12;
+    --ring: 156 59% 40%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-ink text-text-primary font-sans;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  .light body {
+    @apply bg-paper text-text-primary-inverse;
+  }
+
+  /* Typography system — headings default to the display face; everything
+     else stays on the workhorse grotesk. Numerals/data use tabular-nums
+     so figures in tables and stat blocks align vertically. */
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+  }
+
+  .font-tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Visible keyboard focus everywhere — never suppressed for aesthetics */
+  :focus-visible {
+    outline: 2px solid theme("colors.signal.500");
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background-color: theme("colors.signal.500" / 30%);
+  }
+}
+
+@layer utilities {
+  /* Signature motif: faint cartographic survey grid, used behind hero/section
+     backdrops to nod at NIVAAS's PostGIS-grounded, spatial nature. */
+  .bg-grid-signature {
+    background-image: theme("backgroundImage.survey-grid");
+    background-size: theme("backgroundSize.survey-grid");
+  }
+
+  .reduce-motion-safe {
+    @media (prefers-reduced-motion: reduce) {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+}
