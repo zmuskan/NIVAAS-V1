@@ -17,3 +17,5 @@ npm-debug.log*
 
 *.tsbuildinfo
 .vercel
+
+nivaas_backup.sql
