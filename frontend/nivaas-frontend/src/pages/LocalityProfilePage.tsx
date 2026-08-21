@@ -14,60 +14,62 @@ export default function LocalityProfilePage() {
     useEffect(() => {
         if (!slug) return;
 
-        getLocality(slug).then((api) => {
+        getLocality(slug)
+            .then((api) => {
+                if (!api?.name) {
+                    console.error("Locality not found");
+                    return;
+                }
 
-            if (!api.name) {
-                console.error("Locality not found:", slug);
-                return;
-            }
+                const template = localities.find(
+                    (l) =>
+                        l.name?.toLowerCase() ===
+                        api.name?.toLowerCase()
+                );
 
-            const template = localities.find(
-                (l) =>
-                    l.name.toLowerCase() ===
-                    api.name.toLowerCase()
-            );
+                const merged = {
+                    name: api.name,
+                    district: "Bangalore",
 
-            console.log("API =", api);
-            console.log("TEMPLATE =", template);
+                    longBlurb: `${api.name} is a locality in Bangalore.`,
 
-            const merged = {
-                name: api.name,
-                district: "Bangalore",
+                    availability: "Available",
 
-                longBlurb: `${api.name} is a locality in Bangalore.`,
+                    propertyTypes: [],
+                    furnishing: [],
+                    bhkMix: [],
 
-                availability: "Available",
+                    nearby: [],
 
-                propertyTypes: [],
-                furnishing: [],
-                bhkMix: [],
+                    dayInLife: {
+                        morning: "Data coming soon.",
+                        workday: "Data coming soon.",
+                        evening: "Data coming soon.",
+                        weekend: "Data coming soon.",
+                    },
 
-                nearby: [],
+                    imagine: [],
 
-                dayInLife: {
-                    morning: "Data coming soon.",
-                    workday: "Data coming soon.",
-                    evening: "Data coming soon.",
-                    weekend: "Data coming soon.",
-                },
+                    ...template,
 
-                imagine: [],
+                    avgRent: Number(api.avg_rent ?? 0),
+                    listings: Number(api.listing_count ?? 0),
 
-                ...template,
+                    rentRange:
+                        api.min_rent && api.max_rent
+                            ? `₹${Number(
+                                api.min_rent
+                            ).toLocaleString("en-IN")} – ₹${Number(
+                                api.max_rent
+                            ).toLocaleString("en-IN")}`
+                            : "N/A",
+                };
 
-                avgRent: api.avg_rent,
-                listings: api.listing_count,
-
-                rentRange:
-                    api.min_rent && api.max_rent
-                        ? `₹${api.min_rent.toLocaleString("en-IN")} – ₹${api.max_rent.toLocaleString("en-IN")}`
-                        : "N/A",
-            };
-
-            console.log("MERGED =", merged);
-
-            setLocality(merged);
-        });
+                setLocality(merged);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
     }, [slug]);
 
     if (!locality) {
