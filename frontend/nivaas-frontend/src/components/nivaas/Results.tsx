@@ -5,7 +5,6 @@ import {
     inr,
     matchLabels,
     type Answers,
-    type Locality,
     type Match,
 } from "@/data/nivaas";
 
@@ -25,7 +24,6 @@ export function Results({
     matches: Match[];
     onRestart: () => void;
 }) {
-
     const navigate = useNavigate();
 
     return (
@@ -73,7 +71,6 @@ export function Results({
                             className="bg-black/60 backdrop-blur-md overflow-hidden rounded-3xl"
                         >
                             <div className="grid md:grid-cols-5">
-
                                 <div className="relative h-56 md:col-span-2 md:h-full">
                                     <img
                                         src={covers[i % covers.length]}
@@ -89,7 +86,6 @@ export function Results({
                                 </div>
 
                                 <div className="p-7 sm:p-9 md:col-span-3">
-
                                     <div className="flex flex-wrap items-baseline justify-between gap-3">
                                         <div>
                                             <h3 className="text-3xl text-foreground sm:text-4xl">
@@ -166,7 +162,6 @@ export function Results({
                                     >
                                         Explore {m.locality.name}
                                     </button>
-
                                 </div>
                             </div>
                         </motion.article>

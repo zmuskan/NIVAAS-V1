@@ -57,6 +57,10 @@ export default function NivChat() {
 
     const question = QUESTIONS[step];
 
+    if (!question) {
+        return null;
+    }
+
     const choose = (value: string) => {
 
         if (question.key === "priority") {

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
     const navigate = useNavigate();
-    const [name, setName] = useState("");
     const [showIntro, setShowIntro] = useState(true);
 
     useEffect(() => {
@@ -14,14 +13,6 @@ const Hero = () => {
 
         return () => clearTimeout(timer);
     }, []);
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        localStorage.setItem("nivaas_name", name);
-
-        navigate("/questionnaire");
-    };
 
     return (
         <section className="relative z-10 flex min-h-screen items-center justify-center px-6">
