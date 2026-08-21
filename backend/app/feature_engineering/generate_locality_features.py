@@ -124,6 +124,7 @@ def generate_locality_features():
                     AVG(latitude)::DOUBLE PRECISION
                 FROM core.property
                 WHERE latitude IS NOT NULL
+                  AND latitude <> 0
                 GROUP BY locality_id;
             """)
 
@@ -142,8 +143,10 @@ def generate_locality_features():
                     AVG(longitude)::DOUBLE PRECISION
                 FROM core.property
                 WHERE longitude IS NOT NULL
+                  AND longitude <> 0
                 GROUP BY locality_id;
             """)
+
             print("metro_count skipped")
 
         conn.commit()

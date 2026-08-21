@@ -41,6 +41,13 @@ export default function LocalityProfilePage() {
 
                     nearby: [],
 
+                    clusters: [],
+
+                    coords: {
+                        x: 50,
+                        y: 50,
+                    },
+
                     dayInLife: {
                         morning: "Data coming soon.",
                         workday: "Data coming soon.",
@@ -55,17 +62,17 @@ export default function LocalityProfilePage() {
                     avgRent: Number(api.avg_rent ?? 0),
                     listings: Number(api.listing_count ?? 0),
 
-                    overallScore: api.overall_score,
-                    inventoryScore: api.inventory_score,
-                    densityScore: api.density_score,
+                    overallScore: Number(api.overall_score ?? 0),
+                    inventoryScore: Number(api.inventory_score ?? 0),
+                    densityScore: Number(api.density_score ?? 0),
 
                     rentRange:
                         api.min_rent && api.max_rent
-                            ? `₹${Number(
-                                api.min_rent
-                            ).toLocaleString("en-IN")} – ₹${Number(
-                                api.max_rent
-                            ).toLocaleString("en-IN")}`
+                            ? `₹${Number(api.min_rent).toLocaleString(
+                                "en-IN"
+                            )} – ₹${Number(api.max_rent).toLocaleString(
+                                "en-IN"
+                            )}`
                             : "N/A",
                 };
 

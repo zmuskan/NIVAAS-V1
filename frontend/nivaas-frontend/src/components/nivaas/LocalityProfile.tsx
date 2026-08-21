@@ -72,7 +72,7 @@ export function LocalityProfile({
     onBack: () => void;
 }) {
     const day = locality.dayInLife;
-    console.log("LOCALITY DATA", locality);
+    
 
     return (
         <section className="min-h-screen pb-32">

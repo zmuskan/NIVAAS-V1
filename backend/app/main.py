@@ -7,7 +7,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.config import settings
-from backend.app.database import check_connection, close_pool, init_pool
+from backend.app.database import (
+    check_connection,
+    close_pool,
+    init_pool,
+)
+
 from backend.app.api.locality import router as locality_router
 from backend.app.api.analytics import router as analytics_router
 from backend.app.api.property import router as property_router
@@ -15,6 +20,8 @@ from backend.app.api.recommendation import router as recommendation_router
 from backend.app.api.similar import router as similar_router
 from backend.app.api.locality_profile import router as locality_profile_router
 from backend.app.api.localities import router as localities_router
+from backend.app.api.recommend_v2 import router as recommend_router
+
 
 logging.basicConfig(
     level=settings.LOG_LEVEL,
@@ -45,6 +52,10 @@ app = FastAPI(
 )
 
 
+# -----------------------------------------------------
+# CORS
+# -----------------------------------------------------
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -53,6 +64,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# -----------------------------------------------------
+# Health Routes
+# -----------------------------------------------------
 
 @app.get("/")
 def root():
@@ -70,33 +85,24 @@ def health():
         "database": check_connection(),
     }
 
-from fastapi.middleware.cors import CORSMiddleware
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # -----------------------------------------------------
 # Routers
 # -----------------------------------------------------
-#
+
 app.include_router(locality_router)
 
 app.include_router(analytics_router)
 
 app.include_router(property_router)
+
 print("REGISTERING RECOMMEND ROUTER")
 app.include_router(recommendation_router)
-
 
 app.include_router(similar_router)
 
 app.include_router(locality_profile_router)
+
 app.include_router(localities_router)
-# -----------------------------------------------------
+
+app.include_router(recommend_router)

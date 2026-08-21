@@ -36,14 +36,12 @@ def generate_density_score():
 
                         ROUND(
                             (
-                                (
-                                    feature_value
-                                    - MIN(feature_value) OVER ()
-                                )
+                                LN(1 + feature_value)
                                 /
                                 NULLIF(
-                                    MAX(feature_value) OVER ()
-                                    - MIN(feature_value) OVER (),
+                                    LN(
+                                        1 + MAX(feature_value) OVER ()
+                                    ),
                                     0
                                 )
                                 * 100

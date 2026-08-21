@@ -28,7 +28,7 @@ export function AreaMap({ locality }: { locality: Locality }) {
                 />
             </svg>
 
-            {locality.clusters.map((c, i) => (
+            {(locality.clusters ?? []).map((c, i) => (
                 <motion.div
                     key={c.label}
                     initial={{ opacity: 0, scale: 0.7 }}
@@ -47,7 +47,10 @@ export function AreaMap({ locality }: { locality: Locality }) {
                 initial={{ opacity: 0, scale: 0.6 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8 }}
-                style={{ left: `${locality.coords.x}%`, top: `${locality.coords.y}%` }}
+                style={{
+                left: `${locality.coords?.x ?? 50}%`,
+                top: `${locality.coords?.y ?? 50}%`
+                }}
                 className="absolute -translate-x-1/2 -translate-y-1/2"
             >
                 <span className="absolute -inset-5 animate-ping rounded-full bg-primary/25" />

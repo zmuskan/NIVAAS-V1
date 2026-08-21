@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function ExplorePage() {
+    const navigate = useNavigate();
+
     const [localities, setLocalities] = useState<any[]>([]);
     const [search, setSearch] = useState("");
 
@@ -8,6 +11,7 @@ export default function ExplorePage() {
         fetch("http://127.0.0.1:8000/localities")
             .then((res) => res.json())
             .then((data) => {
+                console.log(data.items.slice(0, 20));
                 setLocalities(data.items || []);
             })
             .catch((err) => {
@@ -39,7 +43,12 @@ export default function ExplorePage() {
                 {filteredLocalities.map((item) => (
                     <div
                         key={item.locality}
-                        className="border rounded-xl p-4 shadow hover:shadow-lg transition"
+                        onClick={() =>
+                            navigate(
+                                `/locality/${encodeURIComponent(item.locality)}`
+                            )
+                        }
+                        className="border rounded-xl p-4 shadow hover:shadow-lg transition cursor-pointer"
                     >
                         <h2 className="font-semibold text-lg mb-2">
                             {item.locality}
