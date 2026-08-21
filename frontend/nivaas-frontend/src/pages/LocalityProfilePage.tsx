@@ -31,34 +31,36 @@ export default function LocalityProfilePage() {
             console.log("TEMPLATE =", template);
 
             const merged = {
-            name: api.name,
-            district: "Bangalore",
-            longBlurb: "Locality profile coming soon.",
-            availability: "Steady",
+                name: api.name,
+                district: "Bangalore",
 
-            propertyTypes: [],
-            furnishing: [],
-            bhkMix: [],
+                longBlurb: `${api.name} is a locality in Bangalore.`,
 
-            nearby: [],
+                availability: "Available",
 
-            dayInLife: {
-                morning: "Data coming soon.",
-                workday: "Data coming soon.",
-                evening: "Data coming soon.",
-                weekend: "Data coming soon.",
-            },
+                propertyTypes: [],
+                furnishing: [],
+                bhkMix: [],
 
-            imagine: [],
+                nearby: [],
 
-            ...template,
+                dayInLife: {
+                    morning: "Data coming soon.",
+                    workday: "Data coming soon.",
+                    evening: "Data coming soon.",
+                    weekend: "Data coming soon.",
+                },
+
+                imagine: [],
+
+                ...template,
 
                 avgRent: api.avg_rent,
                 listings: api.listing_count,
 
                 rentRange:
                     api.min_rent && api.max_rent
-                        ? `₹${api.min_rent.toLocaleString()} – ₹${api.max_rent.toLocaleString()}`
+                        ? `₹${api.min_rent.toLocaleString("en-IN")} – ₹${api.max_rent.toLocaleString("en-IN")}`
                         : "N/A",
             };
 
