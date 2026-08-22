@@ -8,7 +8,7 @@ export default function ExplorePage() {
     const [search, setSearch] = useState("");
 
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/localities")
+        fetch("https://nivaas-backend.onrender.com/localities")
             .then((res) => res.json())
             .then((data) => {
                 console.log(data.items.slice(0, 20));

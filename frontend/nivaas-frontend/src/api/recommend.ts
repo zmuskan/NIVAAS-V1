@@ -1,6 +1,6 @@
 import { mapRecommendationToMatch } from "@/utils/recommendationMapper";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://nivaas-backend.onrender.com";
 
 export async function getRecommendations(answers: any) {
     console.log("ANSWERS", answers);
