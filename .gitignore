@@ -114,3 +114,8 @@ dist/
 # ------------------------------------------------------------
 *.db
 nivaas_backup.sql
+
+# Database backups
+nivaas_backup.sql
+nivaas_backup_utf8.sql
+nivaas_backup_supabase.sqlgi 
