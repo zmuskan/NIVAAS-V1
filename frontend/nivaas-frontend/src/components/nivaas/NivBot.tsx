@@ -69,6 +69,7 @@ function answer(text: string, matches: Match[]): string {
 }
 
 export function NivBot({ matches }: { matches: Match[] }) {
+    console.log("NIVBOT RENDERED");
     const [open, setOpen] = useState(false);
     const [input, setInput] = useState("");
     const [msgs, setMsgs] = useState<Msg[]>([

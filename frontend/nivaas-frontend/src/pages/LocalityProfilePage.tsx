@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getLocality } from "../api/locality";
 import { LocalityProfile } from "@/components/nivaas/LocalityProfile";
 import { localities } from "@/data/nivaas";
+import { NivBot } from "@/components/nivaas/NivBot";
 
 export default function LocalityProfilePage() {
     const { slug } = useParams();
@@ -150,9 +151,14 @@ export default function LocalityProfilePage() {
     }
 
     return (
-        <LocalityProfile
-            locality={locality}
-            onBack={() => navigate(-1)}
-        />
+        <>
+            <LocalityProfile
+                locality={locality}
+                onBack={() => navigate(-1)}
+            />
+
+            <NivBot matches={[]} />
+        </>
+
     );
 }
