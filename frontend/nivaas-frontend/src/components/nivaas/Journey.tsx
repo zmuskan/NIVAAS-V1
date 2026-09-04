@@ -135,7 +135,7 @@ export function Journey({ onComplete }: { onComplete: (answers: Answers) => void
             const has = a.priorities.includes(key);
             const next = has
                 ? a.priorities.filter((p) => p !== key)
-                : [...a.priorities, key].slice(0, 3);
+                : [...a.priorities, key].slice(0, 2);
             return { ...a, priorities: next };
         });
     };
@@ -309,7 +309,7 @@ export function Journey({ onComplete }: { onComplete: (answers: Answers) => void
                         step="03"
                         eyebrow="Priorities"
                         title="What matters most in a home?"
-                        caption= "Choose up to two. We'll personalize recommendations around your priorities."
+                        caption="Choose up to two. We'll personalize recommendations around your priorities."
                     />
                     <div className="mt-10 flex flex-wrap gap-3">
                         {priorityOptions.map((p) => (
