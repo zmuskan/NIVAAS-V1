@@ -72,7 +72,7 @@ export function LocalityProfile({
     onBack: () => void;
 }) {
     const day = locality.dayInLife;
-    
+
 
     return (
         <section className="min-h-screen pb-32">
@@ -130,9 +130,11 @@ export function LocalityProfile({
                             <p className="mt-2 text-3xl font-light text-foreground">
                                 {locality.listings?.toLocaleString("en-IN") ?? "0"}
                             </p>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                                Availability: {locality.availability.toLowerCase()}
-                            </p>
+                            {locality.availability && (
+                                <p className="mt-1 text-xs text-muted-foreground">
+                                    Availability: {locality.availability.toLowerCase()}
+                                </p>
+                            )}
                         </div>
                         <div>
                             <p className="track-wide text-[0.5rem] text-muted-foreground">Rent range</p>
@@ -176,13 +178,17 @@ export function LocalityProfile({
                         <div>
                             <p className="track-wide text-[0.5rem] text-muted-foreground">Property types</p>
                             <div className="mt-5">
-                                <Split data={locality.propertyTypes} />
+                                {locality.propertyTypes?.length > 0 && (
+                                    <Split data={locality.propertyTypes} />
+                                )}
                             </div>
                         </div>
                         <div>
                             <p className="track-wide text-[0.5rem] text-muted-foreground">Furnishing</p>
                             <div className="mt-5">
-                                <Split data={locality.furnishing} />
+                                {locality.furnishing?.length > 0 && (
+                                    <Split data={locality.furnishing} />
+                                )}
                             </div>
                         </div>
                         <div>
@@ -190,48 +196,59 @@ export function LocalityProfile({
                                 Configuration mix
                             </p>
                             <div className="mt-5">
-                                <Split data={locality.bhkMix} />
+                                {locality.bhkMix?.length > 0 && (
+                                    <Split data={locality.bhkMix} />
+                                )}
                             </div>
                         </div>
                     </div>
                 </Panel>
 
                 <div className="grid gap-6 md:grid-cols-5">
-                    <Panel delay={0.1} className="md:col-span-3">
-                        <p className="track-wide text-[0.5rem] text-accent">A day in the life</p>
-                        <div className="mt-7 space-y-7">
-                            {[
-                                { t: "Morning", v: day.morning },
-                                { t: "Workday", v: day.workday },
-                                { t: "Evening", v: day.evening },
-                                { t: "Weekend", v: day.weekend },
-                            ].map((s) => (
-                                <div key={s.t} className="border-l border-border pl-5">
-                                    <p className="track-wide text-[0.5rem] text-muted-foreground">{s.t}</p>
-                                    <p className="mt-2 text-base font-light leading-relaxed text-foreground">
-                                        {s.v}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </Panel>
+                    {day && (
+                        <Panel delay={0.1} className="md:col-span-3">
+                            <p className="track-wide text-[0.5rem] text-accent">A day in the life</p>
+                            <div className="mt-7 space-y-7">
+                                {[
+                                    { t: "Morning", v: day.morning },
+                                    { t: "Workday", v: day.workday },
+                                    { t: "Evening", v: day.evening },
+                                    { t: "Weekend", v: day.weekend },
+                                ].map((s) => (
+                                    <div key={s.t} className="border-l border-border pl-5">
+                                        <p className="track-wide text-[0.5rem] text-muted-foreground">{s.t}</p>
+                                        <p className="mt-2 text-base font-light leading-relaxed text-foreground">
+                                            {s.v}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </Panel>
+                    )}
 
                     <Panel delay={0.15} className="md:col-span-2">
                         <p className="track-wide text-[0.5rem] text-accent">Where the homes are</p>
                         <div className="mt-6">
                             <AreaMap locality={locality} />
                         </div>
-                        <p className="mt-6 track-wide text-[0.5rem] text-muted-foreground">Nearby</p>
-                        <div className="mt-4 flex flex-wrap gap-2">
-                            {locality.nearby.map((n) => (
-                                <span
-                                    key={n}
-                                    className="rounded-full bg-zinc-900/80 backdrop-blur-md px-4 py-2 text-xs text-muted-foreground"
-                                >
-                                    {n}
-                                </span>
-                            ))}
-                        </div>
+                        {locality.nearby?.length > 0 && (
+                            <>
+                                <p className="mt-6 track-wide text-[0.5rem] text-muted-foreground">
+                                    Nearby
+                                </p>
+
+                                <div className="mt-4 flex flex-wrap gap-2">
+                                    {locality.nearby.map((n: string) => (
+                                        <span
+                                            key={n}
+                                            className="rounded-full bg-zinc-900/80 backdrop-blur-md px-4 py-2 text-xs text-muted-foreground"
+                                        >
+                                            {n}
+                                        </span>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </Panel>
                 </div>
 

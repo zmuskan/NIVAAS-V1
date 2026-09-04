@@ -18,7 +18,7 @@ def recommend():
 
                     MAX(
                         CASE
-                            WHEN f.feature_name='overall_score'
+                            WHEN f.feature_name='final_score'
                             THEN f.feature_value
                         END
                     ) as score

@@ -105,4 +105,4 @@ app.include_router(locality_profile_router)
 
 app.include_router(localities_router)
 
-app.include_router(recommend_router)
+#app.include_router(recommend_router)

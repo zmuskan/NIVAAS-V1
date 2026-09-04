@@ -2,10 +2,10 @@ from pydantic import BaseModel
 
 
 class RecommendationRequest(BaseModel):
-    budget: str
-    work: str
-    priority: str
-    lifestyle: str
-
-
-print("SCHEMA LOADED")
+    budget: int
+    user_type: str
+    office_locality: str | None = None
+    prioritize_affordability: bool = False
+    prioritize_commute: bool = False
+    prioritize_lifestyle: bool = False
+    prioritize_family: bool = False

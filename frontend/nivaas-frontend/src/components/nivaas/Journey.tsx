@@ -4,11 +4,11 @@ import metro from "@/assets/metro.png";
 import towers from "@/assets/tower.png";
 import street from "@/assets/street.png";
 import courtyard from "@/assets/courtyard.png";
+import { getLocalities } from "@/api/localities";
 import {
     budgetOptions,
     lifestyleOptions,
     priorityOptions,
-    workAreas,
     type Answers,
     type BudgetKey,
     type LifestyleKey,
@@ -115,6 +115,9 @@ export function Journey({ onComplete }: { onComplete: (answers: Answers) => void
     const [answers, setAnswers] = useState<Answers>({ name: "", priorities: [] });
     const [nameDraft, setNameDraft] = useState("");
     const [query, setQuery] = useState("");
+    const [workAreas, setWorkAreas] = useState<
+        { locality: string }[]
+    >([]);
     const [step, setStep] = useState(0); // chapters unlocked
     const [pause, setPause] = useState<"hidden" | "showing">("hidden");
 
@@ -144,6 +147,12 @@ export function Journey({ onComplete }: { onComplete: (answers: Answers) => void
     };
 
     useEffect(() => {
+        getLocalities().then((data) => {
+            setWorkAreas(data);
+        });
+    }, []);
+
+    useEffect(() => {
         if (pause !== "showing") return;
         const t = setTimeout(() => onComplete(answers), 4200);
         return () => clearTimeout(t);
@@ -151,9 +160,15 @@ export function Journey({ onComplete }: { onComplete: (answers: Answers) => void
 
     const matches = query.trim()
         ? workAreas
-            .filter((w) => w.name.toLowerCase().includes(query.trim().toLowerCase()))
-            .slice(0, 5)
-        : workAreas.slice(0, 5);
+            .filter((w) =>
+                w.locality
+                    .toLowerCase()
+                    .includes(
+                        query.trim().toLowerCase()
+                    )
+            )
+            .slice(0, 10)
+        : workAreas.slice(0, 10);
 
     return (
         <div className="relative">
@@ -238,8 +253,19 @@ export function Journey({ onComplete }: { onComplete: (answers: Answers) => void
                         <input
                             value={answers.workArea ?? query}
                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                setQuery(e.target.value);
-                                setAnswers(({ workArea: _prev, ...rest }) => rest);
+                                const value = e.target.value;
+
+                                setQuery(value);
+
+                                setAnswers((a) => ({
+                                    ...a,
+                                    workArea: value,
+                                }));
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    unlock(3, "ch-priorities");
+                                }
                             }}
                             placeholder="Search an office, campus or area"
                             className="w-full rounded-2xl border border-input bg-transparent px-5 py-4 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-primary"
@@ -248,22 +274,22 @@ export function Journey({ onComplete }: { onComplete: (answers: Answers) => void
                             <AnimatePresence initial={false}>
                                 {matches.map((w) => (
                                     <motion.button
-                                        key={w.name}
+                                        key={w.locality}
                                         layout
                                         initial={{ opacity: 0, y: 6 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0 }}
                                         onClick={() => {
-                                            setAnswers((a) => ({ ...a, workArea: w.name }));
-                                            setQuery(w.name);
+                                            setAnswers((a) => ({ ...a, workArea: w.locality }));
+                                            setQuery(w.locality);
                                             unlock(3, "ch-priorities");
                                         }}
-                                        className={`block w-full rounded-2xl px-5 py-3.5 text-left text-sm transition-colors ${answers.workArea === w.name
+                                        className={`block w-full rounded-2xl px-5 py-3.5 text-left text-sm transition-colors ${answers.workArea === w.locality
                                             ? "bg-primary/30 text-foreground"
                                             : "text-muted-foreground hover:bg-primary/15"
                                             }`}
                                     >
-                                        {w.name}
+                                        {w.locality}
                                     </motion.button>
                                 ))}
                             </AnimatePresence>

@@ -25,18 +25,8 @@ def get_recommendations(
     request: RecommendationRequest,
 ):
 
-    budget_map = {
-        "under15": (0, 15000),
-        "15to25": (15000, 25000),
-        "25to40": (25000, 40000),
-        "40to60": (40000, 60000),
-        "60plus": (60000, 100000),
-    }
-
-    min_budget, max_budget = budget_map.get(
-        request.budget,
-        (15000, 25000),
-    )
+    max_budget = request.budget
+    min_budget = int(max_budget * 0.6)
 
     with get_connection() as conn:
 
@@ -49,9 +39,13 @@ def get_recommendations(
         return service.recommend(
             min_budget=min_budget,
             max_budget=max_budget,
-            work=request.work,
-            priority=request.priority,
-            lifestyle=request.lifestyle,
+            work=request.office_locality or "",
+            priority=(
+                "affordable"
+                if request.prioritize_affordability
+                else "choices"
+            ),
+            lifestyle=request.user_type,
             bhk=None,
             limit=10,
         )

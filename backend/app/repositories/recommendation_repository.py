@@ -28,7 +28,49 @@ class RecommendationRepository:
 
             ROUND(MAX(li.rent_amount)) AS max_rent,
 
-            COUNT(*) AS listing_count
+            COUNT(DISTINCT li.listing_id) AS listing_count,
+
+            MAX(
+                CASE
+                    WHEN f.feature_name = 'final_score'
+                    THEN f.feature_value
+                END
+            ) AS final_score,
+
+            MAX(
+                CASE
+                    WHEN f.feature_name = 'student_score'
+                    THEN f.feature_value
+                END
+            ) AS student_score,
+
+            MAX(
+                CASE
+                    WHEN f.feature_name = 'family_score'
+                    THEN f.feature_value
+                END
+            ) AS family_score,
+
+            MAX(
+                CASE
+                    WHEN f.feature_name = 'inventory_score'
+                    THEN f.feature_value
+                END
+            ) AS inventory_score,
+
+            MAX(
+                CASE
+                    WHEN f.feature_name = 'density_score'
+                    THEN f.feature_value
+                END
+            ) AS density_score,
+
+            MAX(
+                CASE
+                    WHEN f.feature_name = 'rent_score'
+                    THEN f.feature_value
+                END
+            ) AS rent_score
 
         FROM core.property p
 
@@ -38,10 +80,13 @@ class RecommendationRepository:
         JOIN core.listing li
             ON li.property_id = p.property_id
 
-        GROUP BY l.name
+        LEFT JOIN feature_store.locality_feature f
+            ON l.locality_id = f.locality_id
+
+        GROUP BY l.locality_id, l.name
+
         HAVING AVG(li.rent_amount) BETWEEN %s AND %s
         """
-
 
         with self._conn.cursor(row_factory=dict_row) as cur:
 
@@ -53,4 +98,11 @@ class RecommendationRepository:
                 ),
             )
 
-            return cur.fetchall()
+            rows = cur.fetchall()
+
+            print("================================")
+            print("FIRST DB ROW")
+            print(rows[0] if rows else "NO ROWS")
+            print("================================")
+
+            return rows

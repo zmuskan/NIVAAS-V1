@@ -64,13 +64,7 @@ export default function LocalityProfilePage() {
                             y: 50,
                         },
 
-                    dayInLife:
-                        template?.dayInLife ?? {
-                            morning: "Data coming soon.",
-                            workday: "Data coming soon.",
-                            evening: "Data coming soon.",
-                            weekend: "Data coming soon.",
-                        },
+                    dayInLife: template?.dayInLife ?? null,
 
                     imagine:
                         template?.imagine ?? [],

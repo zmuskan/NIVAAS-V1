@@ -5,7 +5,7 @@ from backend.app.database import (
 )
 
 
-def generate_overall_scores():
+def generate_final_scores():
 
     init_pool()
 
@@ -14,15 +14,11 @@ def generate_overall_scores():
         with get_connection() as conn:
             with conn.cursor() as cur:
 
-                print("Removing old overall_score...")
-
                 cur.execute("""
                 DELETE
                 FROM feature_store.locality_feature
-                WHERE feature_name = 'overall_score';
+                WHERE feature_name = 'final_score';
                 """)
-
-                print("Generating overall_score...")
 
                 cur.execute("""
                 INSERT INTO feature_store.locality_feature
@@ -31,29 +27,65 @@ def generate_overall_scores():
                     feature_name,
                     feature_value
                 )
-                SELECT
-                    d.locality_id,
-                    'overall_score',
 
-                    (
-                        COALESCE(d.feature_value, 0) * 0.40
-                        +
-                        COALESCE(i.feature_value, 0) * 0.40
-                        +
-                        COALESCE(ds.feature_value, 0) * 0.20
+                SELECT
+
+                    locality_id,
+
+                    'final_score',
+
+                    ROUND(
+                        (
+                            COALESCE(MAX(
+                                CASE
+                                    WHEN feature_name='rent_score'
+                                    THEN feature_value
+                                END
+                            ),0) * 0.30
+
+                            +
+
+                            COALESCE(MAX(
+                                CASE
+                                    WHEN feature_name='inventory_score'
+                                    THEN feature_value
+                                END
+                            ),0) * 0.20
+
+                            +
+
+                            COALESCE(MAX(
+                                CASE
+                                    WHEN feature_name='density_score'
+                                    THEN feature_value
+                                END
+                            ),0) * 0.20
+
+                            +
+
+                            COALESCE(MAX(
+                                CASE
+                                    WHEN feature_name='student_score'
+                                    THEN feature_value
+                                END
+                            ),0) * 0.15
+
+                            +
+
+                            COALESCE(MAX(
+                                CASE
+                                    WHEN feature_name='family_score'
+                                    THEN feature_value
+                                END
+                            ),0) * 0.15
+
+                        )::numeric,
+                        2
                     )
 
-                FROM feature_store.locality_feature d
+                FROM feature_store.locality_feature
 
-                LEFT JOIN feature_store.locality_feature i
-                    ON d.locality_id = i.locality_id
-                    AND i.feature_name = 'inventory_score'
-
-                LEFT JOIN feature_store.locality_feature ds
-                    ON d.locality_id = ds.locality_id
-                    AND ds.feature_name = 'density_score'
-
-                WHERE d.feature_name = 'family_score';
+                GROUP BY locality_id;
                 """)
 
             conn.commit()
@@ -61,8 +93,8 @@ def generate_overall_scores():
     finally:
         close_pool()
 
-    print("Done")
+    print("final_score generated")
 
 
 if __name__ == "__main__":
-    generate_overall_scores()
+    generate_final_scores()
