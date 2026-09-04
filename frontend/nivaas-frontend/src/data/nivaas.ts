@@ -9,11 +9,9 @@ export type Answers = {
 };
 
 export type PriorityKey =
+    | "student"
+    | "family"
     | "affordable"
-    | "quiet"
-    | "choices"
-    | "spacious"
-    | "furnished"
     | "active";
 export type LifestyleKey = "student" | "professional" | "couple" | "family";
 export type BudgetKey = "under15" | "15to25" | "25to40" | "40to60" | "60plus";
@@ -41,12 +39,10 @@ export function budgetFeel(v: number): string {
 }
 
 export const priorityOptions: { key: PriorityKey; label: string }[] = [
-    { key: "affordable", label: "Affordable rent" },
-    { key: "quiet", label: "Quiet neighbourhood" },
-    { key: "choices", label: "More rental options" },
-    { key: "spacious", label: "Spacious homes" },
-    { key: "furnished", label: "Furnished, move-in ready" },
-    { key: "active", label: "Active local life" },
+    { key: "affordable", label: "Affordable Rent" },
+    { key: "family", label: "Short Commute" },
+    { key: "active", label: "Active Lifestyle" },
+    { key: "student", label: "High Availability" },
 ];
 
 export const lifestyleOptions: { key: LifestyleKey; label: string }[] = [
@@ -110,7 +106,7 @@ export const localities: Locality[] = [
             { label: "3 BHK", share: 32 },
         ],
         lifestyleFit: ["professional", "couple", "family"],
-        traits: ["choices", "active", "furnished"],
+        traits: ["student", "active", "student"],
         nearby: ["Koramangala", "Bellandur", "BTM Layout", "Sarjapur Road"],
         coords: { x: 58, y: 68 },
         clusters: [
@@ -157,7 +153,7 @@ export const localities: Locality[] = [
             { label: "3 BHK", share: 26 },
         ],
         lifestyleFit: ["professional", "couple"],
-        traits: ["active", "furnished", "choices"],
+        traits: ["active", "student", "student"],
         nearby: ["Domlur", "Ulsoor", "CV Raman Nagar", "Koramangala"],
         coords: { x: 60, y: 44 },
         clusters: [
@@ -204,7 +200,7 @@ export const localities: Locality[] = [
             { label: "3 BHK", share: 40 },
         ],
         lifestyleFit: ["family", "couple"],
-        traits: ["quiet", "spacious", "affordable"],
+        traits: ["family", "family", "affordable"],
         nearby: ["JP Nagar", "Basavanagudi", "BTM Layout", "Banashankari"],
         coords: { x: 42, y: 68 },
         clusters: [
@@ -251,7 +247,7 @@ export const localities: Locality[] = [
             { label: "3 BHK", share: 42 },
         ],
         lifestyleFit: ["professional", "family", "couple"],
-        traits: ["choices", "spacious", "quiet"],
+        traits: ["student", "family", "family"],
         nearby: ["Marathahalli", "Brookefield", "Varthur", "KR Puram"],
         coords: { x: 82, y: 40 },
         clusters: [
@@ -298,7 +294,7 @@ export const localities: Locality[] = [
             { label: "3 BHK", share: 24 },
         ],
         lifestyleFit: ["student", "professional", "couple"],
-        traits: ["active", "furnished", "choices"],
+        traits: ["active", "student", "student"],
         nearby: ["HSR Layout", "BTM Layout", "Ejipura", "Indiranagar"],
         coords: { x: 54, y: 56 },
         clusters: [
@@ -345,7 +341,7 @@ export const localities: Locality[] = [
             { label: "3 BHK", share: 24 },
         ],
         lifestyleFit: ["student", "professional", "family"],
-        traits: ["affordable", "choices", "spacious", "quiet"],
+        traits: ["affordable", "student", "family", "family"],
         nearby: ["Bommasandra", "Chandapura", "Hosa Road", "Begur"],
         coords: { x: 50, y: 88 },
         clusters: [
@@ -392,7 +388,7 @@ export const localities: Locality[] = [
             { label: "3 BHK", share: 40 },
         ],
         lifestyleFit: ["professional", "family", "couple"],
-        traits: ["quiet", "spacious", "choices"],
+        traits: ["family", "family", "student"],
         nearby: ["Manyata Tech Park", "Yelahanka", "RT Nagar", "Thanisandra"],
         coords: { x: 50, y: 22 },
         clusters: [
@@ -439,7 +435,7 @@ export const localities: Locality[] = [
             { label: "3 BHK", share: 30 },
         ],
         lifestyleFit: ["student", "family", "couple"],
-        traits: ["affordable", "quiet", "spacious"],
+        traits: ["affordable", "family", "family"],
         nearby: ["Jayanagar", "JP Nagar", "Uttarahalli", "Kathriguppe"],
         coords: { x: 32, y: 76 },
         clusters: [
