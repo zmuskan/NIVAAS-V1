@@ -22,9 +22,6 @@ export function mapRecommendationToMatch(item: any) {
 
             rentRange: `₹${Number(item.min_rent).toLocaleString()} - ₹${Number(item.max_rent).toLocaleString()}`,
 
-            imagine: [
-                "Rental demand remains healthy in this locality."
-            ],
         },
 
         reasons: [

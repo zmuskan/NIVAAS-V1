@@ -3,7 +3,7 @@ import { Results } from "@/components/nivaas/Results";
 import { NivBot } from "@/components/nivaas/NivBot";
 import { useEffect, useState } from "react";
 import { getRecommendations } from "@/api/recommend";
-import type { Answers } from "@/data/nivaas";
+import type { Answers } from "../data/nivaas";
 
 type Stage = "journey" | "results";
 

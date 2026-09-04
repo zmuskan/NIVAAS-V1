@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 
 import { getLocality } from "../api/locality";
 import { LocalityProfile } from "@/components/nivaas/LocalityProfile";
-import { localities } from "@/data/nivaas";
 
 export default function LocalityProfilePage() {
     const { slug } = useParams();
@@ -16,17 +15,7 @@ export default function LocalityProfilePage() {
 
         console.log("slug:", slug);
 
-        const templateLocality = localities.find(
-            (locality) => locality.id === slug
-        );
-
-        console.log("template:", templateLocality);
-
-        if (!templateLocality) {
-            return;
-        }
-
-        const localityName = templateLocality.name;
+        const localityName = slug;
 
         console.log("calling api for:", localityName);
 
@@ -34,13 +23,13 @@ export default function LocalityProfilePage() {
             console.log("api response:", api);
 
             const merged = {
-                ...templateLocality,
+                id: slug,
+                name: api.name,
+                avgRent: Number(api.avg_rent ?? 0),
+                minRent: Number(api.min_rent ?? 0),
+                maxRent: Number(api.max_rent ?? 0),
+                listingCount: Number(api.listing_count ?? 0),
 
-                avgRent: Number(api.avg_rent),
-
-                listings: Number(api.listing_count),
-
-                rentRange: `₹${Number(api.min_rent).toLocaleString()} – ₹${Number(api.max_rent).toLocaleString()}`,
             };
 
             setMergedLocality(merged);

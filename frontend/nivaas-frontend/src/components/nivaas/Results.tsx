@@ -6,7 +6,7 @@ import {
     matchLabels,
     type Answers,
     type Match,
-} from "@/data/nivaas";
+} from "../../data/nivaas";
 
 import towers from "@/assets/tower.png";
 import street from "@/assets/street.png";
@@ -93,7 +93,7 @@ export function Results({
                                             </h3>
 
                                             <p className="mt-1.5 text-xs text-accent">
-                                                {m.locality.district}
+                                                Locality profile
                                             </p>
                                         </div>
 
@@ -103,7 +103,9 @@ export function Results({
                                             </p>
 
                                             <p className="mt-1 text-2xl font-light text-foreground">
-                                                {inr(m.locality.avgRent)}
+                                                {m.locality.avgRent !== undefined
+                                                    ? inr(m.locality.avgRent)
+                                                    : "N/A"}
                                                 <span className="text-xs text-muted-foreground">
                                                     {" "} /mo
                                                 </span>
@@ -112,23 +114,25 @@ export function Results({
                                     </div>
 
                                     <p className="mt-5 text-sm font-light leading-relaxed text-muted-foreground">
-                                        {m.locality.blurb}
+                                        {m.reasons[0] ?? "Recommendation data available."}
                                     </p>
 
                                     <div className="mt-7 grid gap-5 sm:grid-cols-3">
                                         <Fact
                                             label="Homes listed"
-                                            value={m.locality.listings.toLocaleString("en-IN")}
+                                            value={m.locality.listingCount?.toLocaleString("en-IN") ?? "N/A"}
                                         />
 
                                         <Fact
                                             label="Availability"
-                                            value={m.locality.availability}
+                                            value="Backend data"
                                         />
 
                                         <Fact
                                             label="Rent range"
-                                            value={m.locality.rentRange}
+                                            value={m.locality.minRent !== undefined && m.locality.maxRent !== undefined
+                                                ? `${inr(m.locality.minRent)} - ${inr(m.locality.maxRent)}`
+                                                : "N/A"}
                                         />
                                     </div>
 

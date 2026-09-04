@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 
 import { getLocality } from "../api/locality";
 import { LocalityProfile } from "@/components/nivaas/LocalityProfile";
-import { localities } from "@/data/nivaas";
 import { NivBot } from "@/components/nivaas/NivBot";
 
 export default function LocalityProfilePage() {
@@ -22,64 +21,13 @@ export default function LocalityProfilePage() {
                     return;
                 }
 
-                const template = localities.find(
-                    (l) =>
-                        l.name?.toLowerCase() ===
-                        api.name?.toLowerCase()
-                );
-
                 const merged = {
-                    ...template,
-
+                    id: slug,
                     name: api.name,
-
-                    district:
-                        template?.district ?? "Bangalore",
-
-                    longBlurb:
-                        template?.longBlurb ??
-                        `${api.name} is a locality in Bangalore.`,
-
-                    availability:
-                        template?.availability ?? "Available",
-
-                    propertyTypes:
-                        template?.propertyTypes ?? [],
-
-                    furnishing:
-                        template?.furnishing ?? [],
-
-                    bhkMix:
-                        template?.bhkMix ?? [],
-
-                    nearby:
-                        template?.nearby ?? [],
-
-                    clusters:
-                        template?.clusters ?? [],
-
-                    coords:
-                        template?.coords ?? {
-                            x: 50,
-                            y: 50,
-                        },
-
-                    dayInLife: template?.dayInLife ?? null,
-
-                    imagine:
-                        template?.imagine ?? [],
-
-                    // --------------------------------
-                    // API / DATABASE VALUES
-                    // --------------------------------
-
-                    avgRent: Number(
-                        api.avg_rent ?? 0
-                    ),
-
-                    listings: Number(
-                        api.listing_count ?? 0
-                    ),
+                    avgRent: Number(api.avg_rent ?? 0),
+                    minRent: Number(api.min_rent ?? 0),
+                    maxRent: Number(api.max_rent ?? 0),
+                    listingCount: Number(api.listing_count ?? 0),
 
                     overallScore:
                         api.overall_score !== null &&
@@ -99,21 +47,6 @@ export default function LocalityProfilePage() {
                             ? Number(api.density_score)
                             : null,
 
-                    rentRange:
-                        api.min_rent !== null &&
-                            api.min_rent !== undefined &&
-                            api.max_rent !== null &&
-                            api.max_rent !== undefined
-                            ? `₹${Number(
-                                api.min_rent
-                            ).toLocaleString(
-                                "en-IN"
-                            )} – ₹${Number(
-                                api.max_rent
-                            ).toLocaleString(
-                                "en-IN"
-                            )}`
-                            : "N/A",
                 };
 
                 console.log(

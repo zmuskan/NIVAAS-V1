@@ -1,67 +1,39 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { inr, localities, type Locality, type Match } from "@/data/nivaas";
+import { inr, type Locality, type Match } from "../../data/nivaas";
 
 type Msg = { role: "bot" | "user"; text: string };
 
-function find(text: string): Locality[] {
+function find(text: string, matches: Match[]): Locality[] {
     const t = text.toLowerCase();
-    return localities.filter(
-        (l) => t.includes(l.name.toLowerCase()) || t.includes(l.id.replace("-", " ")),
-    );
-}
-
-function share(_l: Locality, list: { label: string; share: number }[], word: string) {
-    const hit = list.find((d) => d.label.toLowerCase().includes(word));
-    return hit ? `${hit.share}% of listings` : null;
+    return matches
+        .map((match) => match.locality)
+        .filter(
+            (l) => t.includes(l.name.toLowerCase()) || t.includes(l.id.replace("-", " ")),
+        );
 }
 
 function compare(a: Locality, b: Locality) {
-    const cheaper = a.avgRent <= b.avgRent ? a : b;
-    const deeper = a.listings >= b.listings ? a : b;
     return [
-        `${a.name}: ${inr(a.avgRent)} average, ${a.listings.toLocaleString("en-IN")} homes listed, mostly ${a.propertyTypes[0]?.label.toLowerCase()}.`,
-        `${b.name}: ${inr(b.avgRent)} average, ${b.listings.toLocaleString("en-IN")} homes listed, mostly ${b.propertyTypes[0]?.label.toLowerCase()}.`,
-        `${cheaper.name} is the lighter rent; ${deeper.name} gives you more to choose from.`,
+        `${a.name}: ${a.avgRent !== undefined ? inr(a.avgRent) : "rent unavailable"}.`,
+        `${b.name}: ${b.avgRent !== undefined ? inr(b.avgRent) : "rent unavailable"}.`,
     ].join(" ");
 }
 
 function answer(text: string, matches: Match[]): string {
     const t = text.toLowerCase();
-    const hits = find(text);
+    const hits = find(text, matches);
 
     if (hits.length >= 2 && hits[0] && hits[1]) return compare(hits[0], hits[1]);
 
-    if (/cheap|afford|lowest|budget/.test(t)) {
-        const l = [...localities].sort((a, b) => a.avgRent - b.avgRent)[0]!;
-        return `${l.name} has the lowest average rent of the areas I track — ${inr(l.avgRent)} a month, with homes from ${l.rentRange.split("–")[0]?.trim()}.`;
-    }
-
-    if (/most|choice|options|inventory|available|availability/.test(t)) {
-        const l = [...localities].sort((a, b) => b.listings - a.listings)[0]!;
-        return `${l.name} has the deepest inventory right now — ${l.listings.toLocaleString("en-IN")} active rentals and ${l.availability.toLowerCase()} availability.`;
-    }
-
     if (hits.length === 1 && hits[0]) {
         const l = hits[0];
-        if (/furnish/.test(t)) {
-            return `In ${l.name}, ${l.furnishing.map((f) => `${f.label.toLowerCase()} ${f.share}%`).join(", ")}. ${share(l, l.furnishing, "fully") ?? ""} come move-in ready.`;
-        }
-        if (/3 ?bhk|three/.test(t)) {
-            return `3 BHK homes are ${l.bhkMix.find((b) => b.label === "3 BHK")?.share ?? 0}% of ${l.name} listings — roughly ${Math.round((l.listings * (l.bhkMix.find((b) => b.label === "3 BHK")?.share ?? 0)) / 100).toLocaleString("en-IN")} homes.`;
-        }
-        if (/1 ?bhk|studio|single/.test(t)) {
-            return `1 BHK homes are ${l.bhkMix.find((b) => b.label === "1 BHK")?.share ?? 0}% of ${l.name} listings, and rents start around ${l.rentRange.split("–")[0]?.trim()}.`;
-        }
-        if (/rent|price|cost/.test(t)) {
-            return `${l.name} averages ${inr(l.avgRent)} a month, with the listed range at ${l.rentRange}.`;
-        }
-        return `${l.name} — ${l.blurb} Average rent ${inr(l.avgRent)}, ${l.listings.toLocaleString("en-IN")} homes listed, ${l.availability.toLowerCase()} availability.`;
+        return `${l.name}: backend locality data is available for this recommendation.`;
     }
 
     if (matches.length && /my|match|best|shortlist|recommend/.test(t)) {
         return `Your shortlist: ${matches
-            .map((m) => `${m.locality.name} (${inr(m.locality.avgRent)}, ${m.locality.listings.toLocaleString("en-IN")} homes)`)
+            .map((m) => `${m.locality.name} (${m.locality.avgRent !== undefined ? inr(m.locality.avgRent) : "rent unavailable"})`)
             .join(", ")}. Ask me to compare any two.`;
     }
 

@@ -6,14 +6,13 @@ import street from "@/assets/street.png";
 import courtyard from "@/assets/courtyard.png";
 import { getLocalities } from "@/api/localities";
 import {
-    budgetOptions,
-    lifestyleOptions,
-    priorityOptions,
-    type Answers,
-    type BudgetKey,
-    type LifestyleKey,
-    type PriorityKey,
-} from "@/data/nivaas";
+  type Answers,
+  type PriorityKey,
+  type LifestyleKey,
+  budgetOptions,
+  priorityOptions,
+  lifestyleOptions,
+} from "../../data/nivaas";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 const backgrounds = [metro, towers, courtyard, street, towers];
@@ -230,7 +229,7 @@ export function Journey({ onComplete }: { onComplete: (answers: Answers) => void
                                 key={b.key}
                                 active={answers.budget === b.key}
                                 onClick={() => {
-                                    setAnswers((a) => ({ ...a, budget: b.key as BudgetKey }));
+                                    setAnswers((a) => ({ ...a, budget: b.key }));
                                     unlock(2, "ch-work");
                                 }}
                             >

@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import type { Locality } from "@/data/nivaas";
+import type { Locality } from "../../data/nivaas";
 
 export function AreaMap({ locality }: { locality: Locality }) {
     return (
@@ -28,29 +28,11 @@ export function AreaMap({ locality }: { locality: Locality }) {
                 />
             </svg>
 
-            {(locality.clusters ?? []).map((c, i) => (
-                <motion.div
-                    key={c.label}
-                    initial={{ opacity: 0, scale: 0.7 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.7, delay: 0.2 + i * 0.15 }}
-                    style={{ left: `${c.x}%`, top: `${c.y}%` }}
-                    className="absolute -translate-x-1/2 -translate-y-1/2"
-                >
-                    <span className="glass-soft whitespace-nowrap rounded-full px-3 py-1.5 text-[0.6rem] text-muted-foreground">
-                        {c.label}
-                    </span>
-                </motion.div>
-            ))}
-
             <motion.div
                 initial={{ opacity: 0, scale: 0.6 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8 }}
-                style={{
-                left: `${locality.coords?.x ?? 50}%`,
-                top: `${locality.coords?.y ?? 50}%`
-                }}
+                style={{ left: "50%", top: "50%" }}
                 className="absolute -translate-x-1/2 -translate-y-1/2"
             >
                 <span className="absolute -inset-5 animate-ping rounded-full bg-primary/25" />
@@ -58,7 +40,7 @@ export function AreaMap({ locality }: { locality: Locality }) {
             </motion.div>
 
             <p className="absolute bottom-4 left-5 track-wide text-[0.5rem] text-muted-foreground">
-                {locality.name} · rental clusters
+                {locality.name}
             </p>
         </div>
     );
