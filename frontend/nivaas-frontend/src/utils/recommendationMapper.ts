@@ -11,6 +11,7 @@ export function mapRecommendationToMatch(item: any): Match {
             maxRent: item.max_rent,
 
             listingCount: item.listing_count,
+            highlights: item.highlights ?? [],
 
             overallScore: item.final_score,
             inventoryScore: item.inventory_score,

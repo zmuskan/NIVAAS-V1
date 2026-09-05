@@ -259,17 +259,31 @@ class RecommendationService:
             final_score = max(0, min(final_score, 100))
 
 
-            user_vector = [
-                lifestyle_score,
-                affordability_score,
-                priority_score,
-            ]
+            user_vector = [100, 100, 100]
 
-            locality_vector = [
-                student_score,
-                rent_score,
-                inventory_score,
-            ]
+            if lifestyle.lower() == "student":
+
+                locality_vector = [
+                    student_score,
+                    rent_score,
+                    inventory_score,
+                ]
+
+            elif lifestyle.lower() == "family":
+
+                locality_vector = [
+                    family_score,
+                    rent_score,
+                    inventory_score,
+                ]
+
+            else:
+
+                locality_vector = [
+                    density_score,
+                    rent_score,
+                    inventory_score,
+                ]
 
             similarity_score = (
                 get_similarity(
@@ -279,8 +293,8 @@ class RecommendationService:
             )
 
             final_score = round(
-                final_score * 0.70
-                + similarity_score * 100 * 0.05,
+                final_score
+                + similarity_score * 10,
                 2,
             )
 
@@ -366,6 +380,8 @@ class RecommendationService:
                         avg_rent=float(row["avg_rent"]),
                         max_rent=float(row["max_rent"]),
                         listing_count=listing_count,
+
+                        highlights=highlights,
 
                         inventory_score=round(
                             inventory_score,

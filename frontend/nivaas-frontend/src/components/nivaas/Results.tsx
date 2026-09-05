@@ -263,6 +263,17 @@ export function Results({
                                                 </li>
                                             ))}
                                         </ul>
+
+                                        <div className="mt-3 flex flex-wrap gap-2">
+                                            {m.locality.highlights?.map((h) => (
+                                                <span
+                                                    key={h}
+                                                    className="rounded-full bg-primary/10 px-3 py-1 text-xs"
+                                                >
+                                                    {h}
+                                                </span>
+                                            ))}
+                                        </div>
                                     </div>
 
                                     <button

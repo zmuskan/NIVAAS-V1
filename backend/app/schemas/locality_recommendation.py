@@ -13,6 +13,8 @@ class LocalityRecommendationResponse(BaseModel):
 
     listing_count: int
 
+    highlights: list[str] = []
+
     inventory_score: float
 
     density_score: float

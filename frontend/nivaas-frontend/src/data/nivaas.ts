@@ -58,6 +58,7 @@ export type Locality = {
     minRent?: number;
     maxRent?: number;
     listingCount?: number;
+    highlights?: string[];
     propertyCount?: number;
     overallScore?: number;
     inventoryScore?: number;

@@ -1,4 +1,7 @@
 import google.generativeai as genai
+from backend.app.repositories.nivbot_repository import (
+    NivBotRepository,
+)
 from backend.app.config import settings
 
 genai.configure(
@@ -12,7 +15,32 @@ model = genai.GenerativeModel("gemini-3.6-flash")
 class NivBotService:
 
     @staticmethod
-    async def chat(question: str, locality_context: str):
+
+    async def chat(question: str, locality_name: str):
+
+        locality = NivBotRepository.get_locality_context(
+            locality_name
+        )
+
+        context = str(locality)
+
+        prompt = f"""
+    You are NivBot.
+
+    Bangalore rental advisor.
+
+    Locality Data:
+    {context}
+
+    Question:
+    {question}
+
+    Give practical rental advice.
+    """
+
+        response = model.generate_content(prompt)
+
+        return response.text
 
         prompt = f"""
 You are NivBot, NIVAAS's Bangalore rental advisor.
