@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     DATABASE_URL: str = Field(...)
+    GEMINI_API_KEY: str = ""
 
     HOST: str = "127.0.0.1"
     PORT: int = 8000

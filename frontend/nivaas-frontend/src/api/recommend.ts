@@ -60,5 +60,7 @@ export async function getRecommendations(answers: any) {
         data.recommendations ??
         [];
 
+    console.log("ITEMS", items);
+
     return items.map(mapRecommendationToMatch);
 }

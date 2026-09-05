@@ -1,47 +1,89 @@
-import { motion } from "framer-motion";
+import { useMemo } from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
 import type { Locality } from "../../data/nivaas";
 
+// Vite/webpack don't resolve Leaflet's default marker image paths
+// automatically — point the default icon at the bundled assets so pins
+// render correctly instead of showing broken images.
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
+const defaultIcon = L.icon({
+    iconUrl: markerIcon,
+    iconRetinaUrl: markerIcon2x,
+    shadowUrl: markerShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
+});
+
+/**
+ * Locality centroid coordinates are optional on the backend model until
+ * every row has been backfilled. Widening the type locally (rather than
+ * requiring the shared `Locality` type to carry them) keeps this component
+ * safe to drop in regardless of where the backend is in that rollout.
+ */
+type LocalityWithCentroid = Locality & {
+    centroidLat?: number;
+    centroidLon?: number;
+};
+
 export function AreaMap({ locality }: { locality: Locality }) {
+    const loc = locality as LocalityWithCentroid;
+
+    const center = useMemo<[number, number] | null>(() => {
+        if (typeof loc.centroidLat !== "number" || typeof loc.centroidLon !== "number") {
+            return null;
+        }
+        return [loc.centroidLat, loc.centroidLon];
+    }, [loc.centroidLat, loc.centroidLon]);
+
+    if (!center) {
+        return (
+            <div className="flex h-72 flex-col items-center justify-center rounded-3xl border border-white/10 bg-white/5 p-8 text-center">
+                <div className="text-5xl">📍</div>
+
+                <h3 className="mt-4 text-lg text-foreground">
+                    Location Intelligence Coming Soon
+                </h3>
+
+                <p className="mt-3 max-w-sm text-sm text-muted-foreground">
+                    NIVAAS currently tracks rental activity, pricing and inventory
+                    for this locality. Interactive location mapping is being added
+                    as more geographic data becomes available.
+                </p>
+            </div>
+        );
+    }
+
     return (
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-border bg-[radial-gradient(circle_at_50%_50%,color-mix(in_oklab,var(--dusk)_45%,transparent),transparent_70%)]">
-            <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">
-                {Array.from({ length: 9 }).map((_, i) => (
-                    <g key={i} stroke="oklch(1 0 0 / 0.07)" strokeWidth="0.25">
-                        <line x1={(i + 1) * 10} y1="0" x2={(i + 1) * 10} y2="100" />
-                        <line x1="0" y1={(i + 1) * 10} x2="100" y2={(i + 1) * 10} />
-                    </g>
-                ))}
-                <path
-                    d="M8 78 C 30 62, 44 58, 62 40 S 84 26, 96 18"
-                    fill="none"
-                    stroke="color-mix(in oklab, var(--ember) 70%, transparent)"
-                    strokeWidth="0.7"
-                    strokeDasharray="3 2"
-                />
-                <circle
-                    cx="50"
-                    cy="50"
-                    r="30"
-                    fill="none"
-                    stroke="oklch(1 0 0 / 0.1)"
-                    strokeWidth="0.3"
-                />
-            </svg>
-
-            <motion.div
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-                style={{ left: "50%", top: "50%" }}
-                className="absolute -translate-x-1/2 -translate-y-1/2"
+        <div className="h-[420px] overflow-hidden rounded-2xl border border-white/10">
+            <MapContainer
+                center={center}
+                zoom={13}
+                zoomControl={true}
+                scrollWheelZoom={false}
+                className="h-full w-full"
             >
-                <span className="absolute -inset-5 animate-ping rounded-full bg-primary/25" />
-                <span className="relative grid size-3 place-items-center rounded-full bg-[image:var(--gradient-dusk)] shadow-[var(--shadow-glow)]" />
-            </motion.div>
-
-            <p className="absolute bottom-4 left-5 track-wide text-[0.5rem] text-muted-foreground">
-                {locality.name}
-            </p>
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <Marker position={center} icon={defaultIcon}>
+                    <Popup>
+                        <div>
+                            <strong>{locality.name}</strong>
+                            <br />
+                            Rental activity centre
+                        </div>
+                    </Popup>
+                </Marker>
+            </MapContainer>
         </div>
     );
 }

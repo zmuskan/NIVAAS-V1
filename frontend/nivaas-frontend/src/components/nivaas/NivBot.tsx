@@ -20,9 +20,96 @@ function compare(a: Locality, b: Locality) {
     ].join(" ");
 }
 
+function rankLocalities(matches: Match[]) {
+    return [...matches].sort(
+        (a, b) =>
+            (b.locality.overallScore ?? 0) -
+            (a.locality.overallScore ?? 0)
+    )
+        .map(
+            (m, i) =>
+                `${i + 1}. ${m.locality.name} (${Math.round(
+                    m.locality.overallScore ?? 0
+                )}/100)`
+        )
+        .join("\n");
+}
+
+function cheapestLocality(matches: Match[]) {
+    const cheapest = [...matches].sort(
+        (a, b) =>
+            (a.locality.avgRent ?? Infinity) -
+            (b.locality.avgRent ?? Infinity)
+    )[0];
+
+    if (!cheapest) return "No rental data available.";
+
+    return `${cheapest.locality.name} appears to be the most affordable option with an average rent of ${inr(
+        cheapest.locality.avgRent ?? 0
+    )}.`;
+}
+
+function bestLocality(matches: Match[]) {
+    const best = [...matches].sort(
+        (a, b) =>
+            (b.locality.overallScore ?? 0) -
+            (a.locality.overallScore ?? 0)
+    )[0];
+
+    if (!best) return "No recommendation available.";
+
+    return `${best.locality.name} ranks highest overall with a score of ${Math.round(
+        best.locality.overallScore ?? 0
+    )}/100.`;
+}
+
+function generateProsCons(locality: Locality) {
+    const pros: string[] = [];
+    const cons: string[] = [];
+
+    if ((locality.inventoryScore ?? 0) > 70)
+        pros.push("Strong rental availability");
+
+    if ((locality.densityScore ?? 0) > 70)
+        pros.push("Active neighbourhood");
+
+    if ((locality.avgRent ?? 999999) < 25000)
+        pros.push("Relatively affordable");
+
+    if ((locality.inventoryScore ?? 0) < 40)
+        cons.push("Limited rental inventory");
+
+    if ((locality.avgRent ?? 0) > 35000)
+        cons.push("Higher rental costs");
+
+    return `
+Pros:
+${pros.join(", ") || "None detected"}
+
+Cons:
+${cons.join(", ") || "None detected"}
+`;
+}
+
 function answer(text: string, matches: Match[]): string {
     const t = text.toLowerCase();
     const hits = find(text, matches);
+
+    if (/best|top locality/.test(t)) {
+        return bestLocality(matches);
+    }
+
+    if (/cheap|affordable|lowest rent/.test(t)) {
+        return cheapestLocality(matches);
+    }
+
+    if (/rank|ranking/.test(t)) {
+        return rankLocalities(matches);
+    }
+
+    if (/pros|cons/.test(t) && hits[0]) {
+        return generateProsCons(hits[0]!);
+    }
 
     if (hits.length >= 2 && hits[0] && hits[1]) return compare(hits[0], hits[1]);
 
@@ -66,13 +153,14 @@ export function NivBot({ matches }: { matches: Match[] }) {
         );
     };
 
-    const suggestions = matches.length
-        ? [
-            `Compare ${matches[0]?.locality.name} and ${matches[1]?.locality.name}`,
-            `Furnished homes in ${matches[0]?.locality.name}`,
-            "Which area is most affordable?",
-        ]
-        : ["Which area has the most options?", "Which area is most affordable?"];
+    const suggestions = [
+        "Which area is best?",
+        "Which area is cheapest?",
+        "Rank my localities",
+        matches[0]
+            ? `Pros and cons of ${matches[0].locality.name}`
+            : "Pros and cons",
+    ];
 
     return (
         <>

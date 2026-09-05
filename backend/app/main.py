@@ -15,6 +15,7 @@ from backend.app.database import (
 
 from backend.app.api.locality import router as locality_router
 from backend.app.api.analytics import router as analytics_router
+from backend.app.api.nivbot import router as nivbot_router
 from backend.app.api.property import router as property_router
 from backend.app.api.recommendation import router as recommendation_router
 from backend.app.api.similar import router as similar_router
@@ -106,3 +107,4 @@ app.include_router(locality_profile_router)
 app.include_router(localities_router)
 
 #app.include_router(recommend_router)
+app.include_router(nivbot_router)

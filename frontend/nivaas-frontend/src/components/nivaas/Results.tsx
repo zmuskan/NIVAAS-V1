@@ -15,6 +15,93 @@ import courtyard from "@/assets/courtyard.png";
 const covers = [towers, street, courtyard];
 const ease = [0.22, 1, 0.36, 1] as const;
 
+/**
+ * Builds a short, natural-language explanation of why a locality was
+ * recommended, entirely from backend-provided signals. No locality names
+ * or static copy are hardcoded — everything is derived from the match data.
+ */
+function generateNarrative(match: Match): string {
+    const { locality } = match;
+
+    // Scores may or may not be present depending on the backend response.
+    // Treat them defensively — they can arrive as 0-1 or 0-100 scales.
+    const normalize = (score?: number) => {
+        if (score === undefined || score === null || Number.isNaN(score)) {
+            return undefined;
+        }
+        return score > 1 ? score / 100 : score;
+    };
+
+    const overall = normalize(locality.overallScore);
+    const inventory = normalize(locality.inventoryScore);
+    const density = normalize(locality.densityScore);
+
+    const tier = (score?: number) => {
+        if (score === undefined) return undefined;
+        if (score >= 0.75) return "high" as const;
+        if (score >= 0.45) return "moderate" as const;
+        return "low" as const;
+    };
+
+    const overallTier = tier(overall);
+    const inventoryTier = tier(inventory);
+    const densityTier = tier(density);
+
+    const clauses: string[] = [];
+
+    // Overall fit framing.
+    if (overallTier === "high") {
+        clauses.push("this locality lines up closely with what you're looking for");
+    } else if (overallTier === "moderate") {
+        clauses.push("this locality covers most of what you're looking for");
+    } else if (overallTier === "low") {
+        clauses.push("this locality touches on some of your priorities");
+    } else {
+        clauses.push("this locality was shortlisted based on your preferences");
+    }
+
+    // Rent context.
+    if (locality.avgRent !== undefined) {
+        clauses.push(
+            `average rents are around ${inr(locality.avgRent)} per month`
+        );
+    }
+
+    // Inventory / choice.
+    if (locality.listingCount !== undefined) {
+        const listingsPhrase =
+            inventoryTier === "high"
+                ? "giving you plenty of rental choice"
+                : inventoryTier === "moderate"
+                    ? "giving you a healthy amount of rental choice"
+                    : "with active rental inventory currently available";
+        clauses.push(listingsPhrase);
+    }
+
+    // Density / feel of the neighbourhood.
+    if (densityTier === "high") {
+        clauses.push("in a busier, well-connected pocket of the city");
+    } else if (densityTier === "low") {
+        clauses.push("in a quieter, more spread-out part of the city");
+    } else if (densityTier === "moderate") {
+        clauses.push("in a balanced, moderately dense part of the city");
+    }
+
+    // Stitch clauses into a flowing sentence.
+    const [first, ...rest] = clauses;
+
+    if (!first) {
+        return "Recommended based on your preferences.";
+    }
+
+    if (rest.length === 0) {
+        return `${first.charAt(0).toUpperCase()}${first.slice(1)}.`;
+    }
+
+    const sentence = `${first}, ${rest.join(", ")}.`;
+    return `${sentence.charAt(0).toUpperCase()}${sentence.slice(1)}`;
+}
+
 export function Results({
     answers,
     matches,
@@ -25,6 +112,12 @@ export function Results({
     onRestart: () => void;
 }) {
     const navigate = useNavigate();
+
+    const topMatches = matches.slice(0, 3);
+    const remainingMatches = matches.slice(3);
+
+    const goToLocality = (name: string) =>
+        navigate(`/locality/${encodeURIComponent(name)}`);
 
     return (
         <section className="relative min-h-screen px-5 pb-32 pt-24">
@@ -58,7 +151,7 @@ export function Results({
                 </motion.div>
 
                 <div className="mt-16 space-y-8">
-                    {matches.map((m, i) => (
+                    {topMatches.map((m, i) => (
                         <motion.article
                             key={m.locality.id}
                             initial={{ opacity: 0, y: 50 }}
@@ -114,7 +207,7 @@ export function Results({
                                     </div>
 
                                     <p className="mt-5 text-sm font-light leading-relaxed text-muted-foreground">
-                                        {m.reasons[0] ?? "Recommendation data available."}
+                                        {generateNarrative(m)}
                                     </p>
 
                                     <div className="mt-7 grid gap-5 sm:grid-cols-3">
@@ -124,8 +217,16 @@ export function Results({
                                         />
 
                                         <Fact
-                                            label="Availability"
-                                            value="Backend data"
+                                            label="Inventory Score"
+                                            value={
+                                                m.locality.inventoryScore !== undefined
+                                                    ? `${Math.round(
+                                                        (m.locality.inventoryScore <= 1
+                                                            ? m.locality.inventoryScore * 100
+                                                            : m.locality.inventoryScore),
+                                                    )}`
+                                                    : "N/A"
+                                            }
                                         />
 
                                         <Fact
@@ -137,8 +238,18 @@ export function Results({
                                     </div>
 
                                     <div className="mt-7">
-                                        <p className="track-wide text-[0.5rem] text-accent">
-                                            Why this fits you
+                                        <span className="inline-flex rounded-full bg-accent/15 px-3 py-1.5 text-[0.55rem] track-wide text-accent">
+                                            Match Score {m.locality.overallScore !== undefined
+                                                ? `${Math.round(
+                                                    (m.locality.overallScore <= 1
+                                                        ? m.locality.overallScore * 100
+                                                        : m.locality.overallScore),
+                                                )}%`
+                                                : "N/A"}
+                                        </span>
+
+                                        <p className="mt-3 track-wide text-[0.5rem] text-accent">
+                                            Why NIVAAS picked this
                                         </p>
 
                                         <ul className="mt-4 space-y-2">
@@ -155,13 +266,7 @@ export function Results({
                                     </div>
 
                                     <button
-                                        onClick={() =>
-                                            navigate(
-                                                `/locality/${encodeURIComponent(
-                                                    m.locality.name
-                                                )}`
-                                            )
-                                        }
+                                        onClick={() => goToLocality(m.locality.name)}
                                         className="mt-8 rounded-full bg-[image:var(--gradient-dusk)] px-9 py-3.5 text-xs track-wide text-primary-foreground transition-transform hover:-translate-y-0.5"
                                     >
                                         Explore {m.locality.name}
@@ -171,6 +276,82 @@ export function Results({
                         </motion.article>
                     ))}
                 </div>
+
+                <div className="my-20 border-t border-white/10" />
+
+                {remainingMatches.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.9, ease, delay: 0.2 }}
+                        className="mt-20 opacity-85"
+                    >
+                        <p className="track-wide text-[0.55rem] text-accent">
+                            More neighbourhoods worth exploring
+                        </p>
+
+                        <p className="mt-3 max-w-xl text-sm font-light text-muted-foreground">
+                            These neighbourhoods didn't make the top three, but
+                            may still suit your preferences.
+                        </p>
+
+                        <div className="mt-7 -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4">
+                            {remainingMatches.map((m, i) => (
+                                <div
+                                    key={m.locality.id}
+                                    className="w-[320px] shrink-0 snap-start overflow-hidden rounded-2xl bg-black/60 backdrop-blur-md"
+                                >
+                                    <div className="relative h-32">
+                                        <img
+                                            src={covers[(i + 3) % covers.length]}
+                                            alt={`${m.locality.name} rentals`}
+                                            className="h-full w-full object-cover"
+                                        />
+                                        <div className="veil absolute inset-0 opacity-70" />
+                                    </div>
+
+                                    <div className="p-5">
+                                        <h4 className="text-lg text-foreground">
+                                            {m.locality.name}
+                                        </h4>
+
+                                        <div className="mt-3 flex items-center justify-between gap-3">
+                                            <div>
+                                                <p className="track-wide text-[0.45rem] text-muted-foreground">
+                                                    Avg rent
+                                                </p>
+                                                <p className="mt-0.5 text-sm text-foreground">
+                                                    {m.locality.avgRent !== undefined
+                                                        ? inr(m.locality.avgRent)
+                                                        : "N/A"}
+                                                    <span className="text-[0.65rem] text-muted-foreground">
+                                                        {" "}/mo
+                                                    </span>
+                                                </p>
+                                            </div>
+
+                                            <div className="text-right">
+                                                <p className="track-wide text-[0.45rem] text-muted-foreground">
+                                                    Listed homes
+                                                </p>
+                                                <p className="mt-0.5 text-sm text-foreground">
+                                                    {m.locality.listingCount?.toLocaleString("en-IN") ?? "N/A"}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={() => goToLocality(m.locality.name)}
+                                            className="mt-5 w-full rounded-full border border-white/15 px-4 py-2 text-[0.65rem] track-wide text-foreground transition-colors hover:border-white/30 hover:bg-white/5"
+                                        >
+                                            Explore {m.locality.name}
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
 
                 <div className="mt-16 text-center">
                     <button

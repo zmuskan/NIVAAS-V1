@@ -1,31 +1,24 @@
-export function mapRecommendationToMatch(item: any) {
+import type { Match } from "@/data/nivaas";
+
+export function mapRecommendationToMatch(item: any): Match {
     return {
         locality: {
-            id: item.locality.toLowerCase().replaceAll(" ", "-"),
-
+            id: item.locality,
             name: item.locality,
 
-            district: "Bangalore",
-
             avgRent: item.avg_rent,
+            minRent: item.min_rent,
+            maxRent: item.max_rent,
 
-            blurb: item.match_reason,
+            listingCount: item.listing_count,
 
-            listings: item.listing_count,
-
-            availability:
-                item.listing_count > 100
-                    ? "Very strong"
-                    : item.listing_count > 50
-                        ? "Strong"
-                        : "Steady",
-
-            rentRange: `₹${Number(item.min_rent).toLocaleString()} - ₹${Number(item.max_rent).toLocaleString()}`,
-
+            overallScore: item.final_score,
+            inventoryScore: item.inventory_score,
+            densityScore: item.density_score,
         },
 
-        reasons: [
-            item.match_reason,
-        ],
+        reasons: item.match_reason
+            ? item.match_reason.split(",").map((r: string) => r.trim())
+            : [],
     };
 }
