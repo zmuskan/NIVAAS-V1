@@ -1,131 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { inr, type Locality, type Match } from "../../data/nivaas";
+import { askNivBot } from "../../api/nivbot";
+import type { Match } from "../../data/nivaas";
 
 type Msg = { role: "bot" | "user"; text: string };
-
-function find(text: string, matches: Match[]): Locality[] {
-    const t = text.toLowerCase();
-    return matches
-        .map((match) => match.locality)
-        .filter(
-            (l) => t.includes(l.name.toLowerCase()) || t.includes(l.id.replace("-", " ")),
-        );
-}
-
-function compare(a: Locality, b: Locality) {
-    return [
-        `${a.name}: ${a.avgRent !== undefined ? inr(a.avgRent) : "rent unavailable"}.`,
-        `${b.name}: ${b.avgRent !== undefined ? inr(b.avgRent) : "rent unavailable"}.`,
-    ].join(" ");
-}
-
-function rankLocalities(matches: Match[]) {
-    return [...matches].sort(
-        (a, b) =>
-            (b.locality.overallScore ?? 0) -
-            (a.locality.overallScore ?? 0)
-    )
-        .map(
-            (m, i) =>
-                `${i + 1}. ${m.locality.name} (${Math.round(
-                    m.locality.overallScore ?? 0
-                )}/100)`
-        )
-        .join("\n");
-}
-
-function cheapestLocality(matches: Match[]) {
-    const cheapest = [...matches].sort(
-        (a, b) =>
-            (a.locality.avgRent ?? Infinity) -
-            (b.locality.avgRent ?? Infinity)
-    )[0];
-
-    if (!cheapest) return "No rental data available.";
-
-    return `${cheapest.locality.name} appears to be the most affordable option with an average rent of ${inr(
-        cheapest.locality.avgRent ?? 0
-    )}.`;
-}
-
-function bestLocality(matches: Match[]) {
-    const best = [...matches].sort(
-        (a, b) =>
-            (b.locality.overallScore ?? 0) -
-            (a.locality.overallScore ?? 0)
-    )[0];
-
-    if (!best) return "No recommendation available.";
-
-    return `${best.locality.name} ranks highest overall with a score of ${Math.round(
-        best.locality.overallScore ?? 0
-    )}/100.`;
-}
-
-function generateProsCons(locality: Locality) {
-    const pros: string[] = [];
-    const cons: string[] = [];
-
-    if ((locality.inventoryScore ?? 0) > 70)
-        pros.push("Strong rental availability");
-
-    if ((locality.densityScore ?? 0) > 70)
-        pros.push("Active neighbourhood");
-
-    if ((locality.avgRent ?? 999999) < 25000)
-        pros.push("Relatively affordable");
-
-    if ((locality.inventoryScore ?? 0) < 40)
-        cons.push("Limited rental inventory");
-
-    if ((locality.avgRent ?? 0) > 35000)
-        cons.push("Higher rental costs");
-
-    return `
-Pros:
-${pros.join(", ") || "None detected"}
-
-Cons:
-${cons.join(", ") || "None detected"}
-`;
-}
-
-function answer(text: string, matches: Match[]): string {
-    const t = text.toLowerCase();
-    const hits = find(text, matches);
-
-    if (/best|top locality/.test(t)) {
-        return bestLocality(matches);
-    }
-
-    if (/cheap|affordable|lowest rent/.test(t)) {
-        return cheapestLocality(matches);
-    }
-
-    if (/rank|ranking/.test(t)) {
-        return rankLocalities(matches);
-    }
-
-    if (/pros|cons/.test(t) && hits[0]) {
-        return generateProsCons(hits[0]!);
-    }
-
-    if (hits.length >= 2 && hits[0] && hits[1]) return compare(hits[0], hits[1]);
-
-    if (hits.length === 1 && hits[0]) {
-        const l = hits[0];
-        return `${l.name}: backend locality data is available for this recommendation.`;
-    }
-
-    if (matches.length && /my|match|best|shortlist|recommend/.test(t)) {
-        return `Your shortlist: ${matches
-            .map((m) => `${m.locality.name} (${m.locality.avgRent !== undefined ? inr(m.locality.avgRent) : "rent unavailable"})`)
-            .join(", ")}. Ask me to compare any two.`;
-    }
-
-    return "I can compare two areas, or answer on rents, availability, furnishing and BHK mix. Try “compare HSR Layout and Whitefield” or “furnished homes in Indiranagar”.";
-}
 
 export function NivBot({ matches }: { matches: Match[] }) {
     console.log("NIVBOT RENDERED");
@@ -143,14 +21,35 @@ export function NivBot({ matches }: { matches: Match[] }) {
         endRef.current?.scrollIntoView({ block: "nearest" });
     }, [msgs, open]);
 
-    const send = (text: string) => {
+    const send = async (text: string) => {
         if (!text.trim()) return;
+
         setInput("");
-        setMsgs((m) => [...m, { role: "user", text }]);
-        setTimeout(
-            () => setMsgs((m) => [...m, { role: "bot", text: answer(text, matches) }]),
-            420,
-        );
+
+        setMsgs((m) => [
+            ...m,
+            { role: "user", text },
+        ]);
+
+        try {
+            const response = await askNivBot(text);
+
+            setMsgs((m) => [
+                ...m,
+                {
+                    role: "bot",
+                    text: response.answer,
+                },
+            ]);
+        } catch {
+            setMsgs((m) => [
+                ...m,
+                {
+                    role: "bot",
+                    text: "Sorry, I couldn't generate a response.",
+                },
+            ]);
+        }
     };
 
     const suggestions = [
