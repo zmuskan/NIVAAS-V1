@@ -5,6 +5,7 @@ export type NivBotResponse = {
 };
 
 const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL ||
     "https://nivaas-backend.onrender.com";
 
 export async function askNivBot(
