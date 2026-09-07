@@ -54,7 +54,10 @@ export default function NivaasExperience() {
             )}
 
             {stage !== "journey" && (
-                <NivBot matches={matches} />
+                <NivBot
+                    matches={matches}
+                    localityName={matches[0]?.locality?.name ?? ""}
+                />
             )}
         </main>
     );

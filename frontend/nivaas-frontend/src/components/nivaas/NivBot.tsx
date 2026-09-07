@@ -5,7 +5,7 @@ import type { Match } from "../../data/nivaas";
 
 type Msg = { role: "bot" | "user"; text: string };
 
-export function NivBot({ matches }: { matches: Match[] }) {
+export function NivBot({ matches, localityName = "" }: { matches: Match[]; localityName?: string }) {
     console.log("NIVBOT RENDERED");
     const [open, setOpen] = useState(false);
     const [input, setInput] = useState("");
@@ -32,7 +32,7 @@ export function NivBot({ matches }: { matches: Match[] }) {
         ]);
 
         try {
-            const response = await askNivBot(text);
+            const response = await askNivBot(text, localityName);
 
             setMsgs((m) => [
                 ...m,

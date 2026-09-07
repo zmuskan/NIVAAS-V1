@@ -4,13 +4,19 @@ export type NivBotResponse = {
     answer: string;
 };
 
-export async function askNivBot(question: string): Promise<NivBotResponse> {
+const API_BASE_URL =
+    "https://nivaas-backend.onrender.com";
+
+export async function askNivBot(
+    question: string,
+    localityName: string = ""
+): Promise<NivBotResponse> {
     const response = await axios.post<NivBotResponse>(
-        "http://localhost:8000/nivbot/chat",
+        `${API_BASE_URL}/nivbot/chat`,
         {
             question,
-            locality_context: "",
-        },
+            locality_name: localityName,
+        }
     );
 
     return response.data;

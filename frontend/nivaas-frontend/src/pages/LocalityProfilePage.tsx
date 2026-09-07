@@ -84,7 +84,7 @@ export default function LocalityProfilePage() {
                 onBack={() => navigate(-1)}
             />
 
-            <NivBot matches={[]} />
+            <NivBot matches={[]} localityName={locality.name} />
         </>
 
     );

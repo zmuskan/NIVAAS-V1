@@ -23,7 +23,7 @@ async def chat(payload: NivBotRequest):
 
     answer = await NivBotService.chat(
         payload.question,
-        payload.locality_context,
+        payload.locality_name,
     )
 
     return NivBotResponse(
