@@ -12,13 +12,20 @@ export async function askNivBot(
     question: string,
     localityName: string = ""
 ): Promise<NivBotResponse> {
-    const response = await axios.post<NivBotResponse>(
-        `${API_BASE_URL}/nivbot/chat`,
-        {
-            question,
-            locality_name: localityName,
-        }
-    );
+    try {
+        const response = await axios.post<NivBotResponse>(
+            `${API_BASE_URL}/nivbot/chat`,
+            {
+                question,
+                locality_name: localityName,
+            }
+        );
 
-    return response.data;
+        console.log("NIVBOT SUCCESS", response.data);
+
+        return response.data;
+    } catch (error) {
+        console.error("NIVBOT FAILED", error);
+        throw error;
+    }
 }
