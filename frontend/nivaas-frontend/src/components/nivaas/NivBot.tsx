@@ -5,7 +5,7 @@ import type { Match } from "../../data/nivaas";
 
 type Msg = { role: "bot" | "user"; text: string };
 
-export function NivBot({ matches, localityName = "" }: { matches: Match[]; localityName?: string }) {
+export function NivBot({ localityName = "" }: { matches: Match[]; localityName?: string }) {
     console.log("NIVBOT RENDERED");
     const [open, setOpen] = useState(false);
     const [input, setInput] = useState("");
@@ -22,7 +22,20 @@ export function NivBot({ matches, localityName = "" }: { matches: Match[]; local
     }, [msgs, open]);
 
     const send = async (text: string) => {
-        if (!text.trim()) return;
+        const gibberish =
+            text.trim().length < 3 ||
+            /^[^a-zA-Z]+$/.test(text);
+
+        if (gibberish) {
+            setMsgs((m) => [
+                ...m,
+                {
+                    role: "bot",
+                    text: "I couldn't understand that question. Try asking about rent, affordability, listings, density, or locality scores.",
+                },
+            ]);
+            return;
+        }
 
         setInput("");
 
@@ -52,14 +65,30 @@ export function NivBot({ matches, localityName = "" }: { matches: Match[]; local
         }
     };
 
-    const suggestions = [
-        "Which area is best?",
-        "Which area is cheapest?",
-        "Rank my localities",
-        matches[0]
-            ? `Pros and cons of ${matches[0].locality.name}`
-            : "Pros and cons",
-    ];
+    const categories = {
+        Rent: [
+            "What's the average rent?",
+            "Is this area expensive?",
+            "Is this area affordable?",
+        ],
+        Availability: [
+            "How many listings are available?",
+            "Is inventory good?",
+        ],
+        Density: [
+            "Is this area crowded?",
+            "How dense is this area?",
+        ],
+        Score: [
+            "What is the overall score?",
+            "Why is this locality recommended?",
+        ],
+        Analysis: [
+            "Pros and cons",
+        ],
+    };
+    const [selectedCategory, setSelectedCategory] =
+        useState<keyof typeof categories | null>(null);
 
     return (
         <>
@@ -101,16 +130,43 @@ export function NivBot({ matches, localityName = "" }: { matches: Match[]; local
                             <div ref={endRef} />
                         </div>
 
-                        <div className="mt-3 flex flex-wrap gap-2">
-                            {suggestions.map((s) => (
-                                <button
-                                    key={s}
-                                    onClick={() => send(s)}
-                                    className="glass-soft rounded-full px-3 py-1.5 text-[0.6rem] text-muted-foreground transition-colors hover:text-foreground"
-                                >
-                                    {s}
-                                </button>
-                            ))}
+                        <div className="mt-3">
+                            {!selectedCategory ? (
+                                <div className="flex flex-wrap gap-2">
+                                    {Object.keys(categories).map((category) => (
+                                        <button
+                                            key={category}
+                                            onClick={() =>
+                                                setSelectedCategory(
+                                                    category as keyof typeof categories
+                                                )
+                                            }
+                                            className="glass-soft rounded-full px-3 py-1.5 text-[0.6rem]"
+                                        >
+                                            {category}
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="flex flex-wrap gap-2">
+                                    {categories[selectedCategory].map((question) => (
+                                        <button
+                                            key={question}
+                                            onClick={() => send(question)}
+                                            className="glass-soft rounded-full px-3 py-1.5 text-[0.6rem]"
+                                        >
+                                            {question}
+                                        </button>
+                                    ))}
+
+                                    <button
+                                        onClick={() => setSelectedCategory(null)}
+                                        className="glass-soft rounded-full px-3 py-1.5 text-[0.6rem]"
+                                    >
+                                        ← Back
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
                         <form

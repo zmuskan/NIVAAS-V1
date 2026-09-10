@@ -110,4 +110,88 @@ class NivBotService:
         if any(word in lowered_question for word in ("listing", "availability", "available", "inventory")):
             return f"{name} has {listing_count:.0f} active listings and an inventory score of {inventory_score:.0f}."
 
-        return f"{name} has an overall score of {overall_score:.0f}, average rent of ₹{avg_rent:,.0f}, and {listing_count:.0f} active listings."
+        if "pros" in lowered_question or "cons" in lowered_question:
+            pros = []
+            cons = []
+
+            if rent_score >= 70:
+                pros.append("Relatively affordable rents")
+            elif rent_score <= 40:
+                cons.append("Higher rental costs")
+
+            if inventory_score >= 70:
+                pros.append("Good housing availability")
+            elif inventory_score <= 40:
+                cons.append("Limited housing inventory")
+
+            if density_score <= 40:
+                pros.append("Less crowded environment")
+            elif density_score >= 70:
+                cons.append("Can feel crowded")
+
+            if overall_score >= 70:
+                pros.append("Strong overall locality performance")
+            elif overall_score <= 40:
+                cons.append("Below-average overall locality score")
+
+            if not pros:
+                pros.append("Moderate rental market conditions")
+
+            if not cons:
+                cons.append("No major weaknesses identified from available data")
+
+            return (
+                f"Pros of {name}: " + ", ".join(pros) +
+                ". Cons: " + ", ".join(cons) + "."
+            )
+
+        if "overall" in lowered_question or "score" in lowered_question:
+            if overall_score >= 75:
+                verdict = "one of the stronger-performing localities"
+            elif overall_score >= 50:
+                verdict = "a moderately performing locality"
+            else:
+                verdict = "a below-average locality based on current metrics"
+
+            return (
+                f"{name} is {verdict}. "
+                f"It has an overall score of {overall_score:.0f}, "
+                f"average rent of ₹{avg_rent:,.0f}, "
+                f"and {listing_count:.0f} active listings."
+            )
+
+        if "recommended" in lowered_question or "why" in lowered_question:
+            return (
+                f"{name} is evaluated using rental affordability, "
+                f"housing availability, density, and overall locality metrics. "
+                f"It currently has an overall score of {overall_score:.0f}, "
+                f"rent score of {rent_score:.0f}, "
+                f"and inventory score of {inventory_score:.0f}."
+            )
+
+        if any(word in lowered_question for word in ("quiet", "peaceful", "calm")):
+            if density_score <= 40:
+                return (
+                    f"{name} appears relatively peaceful based on its "
+                    f"density score of {density_score:.0f}."
+                )
+
+            if density_score <= 70:
+                return (
+                    f"{name} has moderate activity levels with a "
+                    f"density score of {density_score:.0f}."
+                )
+
+            return (
+                f"{name} may feel busy or crowded based on its "
+                f"density score of {density_score:.0f}."
+            )
+
+        return (
+            f"{name} has an overall score of {overall_score:.0f}, "
+            f"average rent of ₹{avg_rent:,.0f}, "
+            f"inventory score of {inventory_score:.0f}, "
+            f"and {listing_count:.0f} active listings. "
+            f"Try asking about affordability, density, availability, "
+            f"pros and cons, or locality scores."
+        )
