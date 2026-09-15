@@ -25,9 +25,6 @@ def get_recommendations(
     request: RecommendationRequest,
 ):
 
-    max_budget = request.budget
-    min_budget = int(max_budget * 0.6)
-
     with get_connection() as conn:
 
         repository = RecommendationRepository(conn)
@@ -37,15 +34,15 @@ def get_recommendations(
         )
 
         return service.recommend(
-            min_budget=min_budget,
-            max_budget=max_budget,
+            min_budget=request.min_budget,
+            max_budget=request.max_budget,
             work=request.office_locality or "",
             priority=(
                 "affordable"
                 if request.prioritize_affordability
                 else "choices"
             ),
-            lifestyle=request.user_type,
+            lifestyle=request.user_type or "",
             bhk=None,
             limit=10,
         )

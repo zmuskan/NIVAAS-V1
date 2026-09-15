@@ -12,8 +12,10 @@ async def chat(request: NivBotRequest):
 
     try:
         answer = await NivBotService.chat(
-            request.question,
-            request.locality_name,
+            question=request.question,
+            locality_name=request.locality_name,
+            mode=request.mode,
+            compare_names=request.compare_names,
         )
 
         return {"answer": answer}

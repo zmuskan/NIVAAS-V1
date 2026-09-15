@@ -1,19 +1,29 @@
 import { mapRecommendationToMatch } from "@/utils/recommendationMapper";
+import { budgetRanges, type BudgetKey } from "@/data/nivaas";
 
 const API_BASE = "https://nivaas-backend.onrender.com";
 
 export async function getRecommendations(answers: any) {
     console.log("ANSWERS", answers);
 
-    const budgetMap: Record<string, number> = {
-        upto15: 15000,
-        "15to25": 25000,
-        "25to40": 40000,
-        above40: 50000,
+    const budgetMap: Record<
+        BudgetKey,
+        { min: number; max: number }
+    > = {
+        under15: budgetRanges.UNDER_15K,
+        "15to25": budgetRanges.BETWEEN_15_25K,
+        "25to40": budgetRanges.BETWEEN_25_40K,
+        "40to60": budgetRanges.BETWEEN_40_60K,
+        "60plus": budgetRanges.ABOVE_60K,
     };
 
+    const selectedBudget =
+        budgetMap[answers.budget as BudgetKey] ??
+        budgetRanges.BETWEEN_15_25K;
+
     const requestBody = {
-        budget: budgetMap[answers.budget] ?? 25000,
+        min_budget: selectedBudget.min,
+        max_budget: selectedBudget.max,
 
         user_type: answers.lifestyle,
 

@@ -97,7 +97,6 @@ app.include_router(analytics_router)
 
 app.include_router(property_router)
 
-print("REGISTERING RECOMMEND ROUTER")
 app.include_router(recommendation_router)
 
 app.include_router(similar_router)

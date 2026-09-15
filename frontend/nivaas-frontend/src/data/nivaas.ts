@@ -15,6 +15,29 @@ export type PriorityKey =
 export type LifestyleKey = "student" | "professional" | "couple" | "family";
 export type BudgetKey = "under15" | "15to25" | "25to40" | "40to60" | "60plus";
 
+export const budgetRanges = {
+    UNDER_15K: {
+        min: 0,
+        max: 15000,
+    },
+    BETWEEN_15_25K: {
+        min: 15000,
+        max: 25000,
+    },
+    BETWEEN_25_40K: {
+        min: 25000,
+        max: 40000,
+    },
+    BETWEEN_40_60K: {
+        min: 40000,
+        max: 60000,
+    },
+    ABOVE_60K: {
+        min: 60000,
+        max: 999999,
+    },
+} as const;
+
 export const budgetSlider = {
     min: 8000,
     max: 80000,
@@ -22,11 +45,11 @@ export const budgetSlider = {
 } as const;
 
 export const budgetOptions: { key: BudgetKey; label: string; value: number }[] = [
-    { key: "under15", label: "Under 15k", value: 15000 },
-    { key: "15to25", label: "15k - 25k", value: 25000 },
-    { key: "25to40", label: "25k - 40k", value: 40000 },
-    { key: "40to60", label: "40k - 60k", value: 60000 },
-    { key: "60plus", label: "60k+", value: 80000 },
+    { key: "under15", label: "Under 15k", value: budgetRanges.UNDER_15K.max },
+    { key: "15to25", label: "15k - 25k", value: budgetRanges.BETWEEN_15_25K.max },
+    { key: "25to40", label: "25k - 40k", value: budgetRanges.BETWEEN_25_40K.max },
+    { key: "40to60", label: "40k - 60k", value: budgetRanges.BETWEEN_40_60K.max },
+    { key: "60plus", label: "60k+", value: budgetRanges.ABOVE_60K.max },
 ];
 
 export function budgetFeel(v: number): string {

@@ -4,91 +4,132 @@ import { askNivBot } from "../../api/nivbot";
 import type { Match } from "../../data/nivaas";
 
 type Msg = { role: "bot" | "user"; text: string };
+type NivBotMode = "locality" | "recommendation";
 
-export function NivBot({ localityName = "" }: { matches: Match[]; localityName?: string }) {
-    console.log("NIVBOT RENDERED");
+type NivBotProps = {
+    matches: Match[];
+    localityName?: string;
+    /**
+     * "locality"       -> renders on a single locality profile page, acts as
+     *                     an area advisor for that one place.
+     * "recommendation" -> renders on the recommendations/listing page,
+     *                     leads with comparison and ranking explanations.
+     */
+    mode?: NivBotMode;
+};
+
+const GREETINGS: Record<NivBotMode, string> = {
+    locality:
+        "I'm NivBot, your advisor for this area. Ask me about rent, affordability, what it feels like day-to-day, or the pros and cons of living here.",
+    recommendation:
+        "I'm NivBot. I can explain why a locality ranked where it did, break down trade-offs, or compare two areas side by side.",
+};
+
+const LOCALITY_CATEGORIES: Record<string, string[]> = {
+    "Rent & Budget": [
+        "What's the average rent here?",
+        "Is this area affordable for me?",
+        "Is this area expensive?",
+    ],
+    "Availability": [
+        "How many listings are available?",
+        "Is it easy to find a place here?",
+    ],
+    "Neighborhood Feel": [
+        "Is this area crowded?",
+        "Is it quiet here?",
+    ],
+    "Should I Move Here": [
+        "Pros and cons of this area",
+        "Is this locality worth considering?",
+        "Any practical tips before I move here?",
+    ],
+};
+
+const RECOMMENDATION_CATEGORIES: Record<string, string[]> = {
+    "Why This Ranking": [
+        "Why is this locality ranked here?",
+        "What made this locality rank higher?",
+    ],
+    "Trade-offs": [
+        "What are the trade-offs of this locality?",
+        "Pros and cons",
+    ],
+    "Compare": [
+        "Compare the top two localities",
+        "Which of these is cheaper?",
+        "Which of these has better availability?",
+    ],
+    "Fit For You": [
+        "Which is better for a tight budget?",
+        "Which is calmer to live in?",
+    ],
+    "Best Choice": [
+        "Which locality would you personally choose?",
+        "Which offers the best balance overall?",
+    ],
+};
+
+export function NivBot({ matches, localityName = "", mode = "locality" }: NivBotProps) {
     const [open, setOpen] = useState(false);
     const [input, setInput] = useState("");
-    const [msgs, setMsgs] = useState<Msg[]>([
-        {
-            role: "bot",
-            text: "I'm NivBot. Ask me to compare neighbourhoods or dig into what's actually available to rent.",
-        },
-    ]);
+    const [msgs, setMsgs] = useState<Msg[]>([{ role: "bot", text: GREETINGS[mode] }]);
     const endRef = useRef<HTMLDivElement>(null);
+
+    // Reset the greeting if the page context (mode) changes, e.g. the same
+    // component instance is reused across a locality page and a
+    // recommendations page.
+    useEffect(() => {
+        setMsgs([{ role: "bot", text: GREETINGS[mode] }]);
+    }, [mode]);
 
     useEffect(() => {
         endRef.current?.scrollIntoView({ block: "nearest" });
     }, [msgs, open]);
 
+    // On the recommendations page, "compare" style questions should carry
+    // the top matches along so the backend can look up all of them, not
+    // just the single locality currently in view.
+    const compareLocalities =
+        mode === "recommendation"
+            ? matches.slice(0, 3).map((m) => m.locality.name)
+            : [];
+
     const send = async (text: string) => {
-        const gibberish =
-            text.trim().length < 3 ||
-            /^[^a-zA-Z]+$/.test(text);
+        const gibberish = text.trim().length < 3 || /^[^a-zA-Z]+$/.test(text);
 
         if (gibberish) {
             setMsgs((m) => [
                 ...m,
                 {
                     role: "bot",
-                    text: "I couldn't understand that question. Try asking about rent, affordability, listings, density, or locality scores.",
+                    text: "I couldn't understand that question. Try asking about rent, availability, the neighborhood feel, pros and cons, or affordability.",
                 },
             ]);
             return;
         }
 
         setInput("");
-
-        setMsgs((m) => [
-            ...m,
-            { role: "user", text },
-        ]);
+        setMsgs((m) => [...m, { role: "user", text }]);
 
         try {
-            const response = await askNivBot(text, localityName);
+            const response = await askNivBot(text, localityName, { mode, compareLocalities });
 
-            setMsgs((m) => [
-                ...m,
-                {
-                    role: "bot",
-                    text: response.answer,
-                },
-            ]);
+            setMsgs((m) => [...m, { role: "bot", text: response.answer }]);
         } catch {
             setMsgs((m) => [
                 ...m,
-                {
-                    role: "bot",
-                    text: "Sorry, I couldn't generate a response.",
-                },
+                { role: "bot", text: "Sorry, I couldn't generate a response. Please try again." },
             ]);
         }
     };
 
-    const categories = {
-        Rent: [
-            "What's the average rent?",
-            "Is this area expensive?",
-            "Is this area affordable?",
-        ],
-        Availability: [
-            "How many listings are available?",
-            "Is inventory good?",
-        ],
-        Density: [
-            "Is this area crowded?",
-            "How dense is this area?",
-        ],
-        Score: [
-            "What is the overall score?",
-            "Why is this locality recommended?",
-        ],
-        Analysis: [
-            "Pros and cons",
-        ],
-    };
-    const [selectedCategory, setSelectedCategory] =
-        useState<keyof typeof categories | null>(null);
+    const categories = mode === "recommendation" ? RECOMMENDATION_CATEGORIES : LOCALITY_CATEGORIES;
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+    useEffect(() => {
+        setSelectedCategory(null);
+    }, [mode]);
 
     return (
         <>
@@ -104,7 +145,9 @@ export function NivBot({ localityName = "" }: { matches: Match[]; localityName?:
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="track-wide text-[0.5rem] text-accent">NivBot</p>
-                                <p className="mt-1 text-sm text-foreground">Rental questions, answered</p>
+                                <p className="mt-1 text-sm text-foreground">
+                                    {mode === "recommendation" ? "Compare & decide" : "Rental questions, answered"}
+                                </p>
                             </div>
                             <button
                                 onClick={() => setOpen(false)}
@@ -119,7 +162,7 @@ export function NivBot({ localityName = "" }: { matches: Match[]; localityName?:
                             {msgs.map((m, i) => (
                                 <div
                                     key={i}
-                                    className={`max-w-[88%] rounded-2xl px-4 py-3 text-xs leading-relaxed ${m.role === "bot"
+                                    className={`max-w-[88%] whitespace-pre-line rounded-2xl px-4 py-3 text-xs leading-relaxed ${m.role === "bot"
                                         ? "glass-soft text-muted-foreground"
                                         : "ml-auto bg-primary/30 text-foreground"
                                         }`}
@@ -136,11 +179,7 @@ export function NivBot({ localityName = "" }: { matches: Match[]; localityName?:
                                     {Object.keys(categories).map((category) => (
                                         <button
                                             key={category}
-                                            onClick={() =>
-                                                setSelectedCategory(
-                                                    category as keyof typeof categories
-                                                )
-                                            }
+                                            onClick={() => setSelectedCategory(category)}
                                             className="glass-soft rounded-full px-3 py-1.5 text-[0.6rem]"
                                         >
                                             {category}
@@ -149,7 +188,7 @@ export function NivBot({ localityName = "" }: { matches: Match[]; localityName?:
                                 </div>
                             ) : (
                                 <div className="flex flex-wrap gap-2">
-                                    {categories[selectedCategory].map((question) => (
+                                    {categories[selectedCategory]?.map((question) => (
                                         <button
                                             key={question}
                                             onClick={() => send(question)}

@@ -62,15 +62,13 @@ class RecommendationService:
         limit: int,
     ) -> LocalityRecommendationListResponse:
 
+        print("FILTERING", min_budget, max_budget)
+
         rows = self.repository.fetch_candidates(
             min_budget,
             max_budget,
         )
-        print("TOTAL ROWS FROM DB:", len(rows))
-
-        if rows:
-            print("FIRST ROW:")
-            print(rows[0])
+        print("ROWS RETURNED:", len(rows))
 
         scored_items = []
 
@@ -85,14 +83,13 @@ class RecommendationService:
 
                 if locality in WORK_CLUSTERS[work_key]:
 
-                    commute_bonus = 15
+                    commute_bonus = 35
 
             avg_rent = float(row["avg_rent"])
 
             listing_count = int(row["listing_count"])
-            print(locality, listing_count)
 
-            if listing_count < 3:
+            if listing_count < 5:
                 continue
 
             final_base_score = float(
@@ -157,21 +154,31 @@ class RecommendationService:
             # Affordability Score
             #################################################
 
-            mid_budget = (
-                min_budget + max_budget
-            ) / 2
+            budget_fit_score = 0
 
-            affordability_score = max(
-                0,
-                100
-                - (
-                    abs(
-                        avg_rent - mid_budget
-                    )
-                    / mid_budget
+            if min_budget <= avg_rent <= max_budget:
+
+                budget_fit_score = 100
+
+            elif avg_rent < min_budget:
+
+                budget_fit_score = max(
+                    60,
+                    100 - (
+                        (min_budget - avg_rent)
+                        / min_budget
+                    ) * 40,
                 )
-                * 100,
-            )
+
+            else:
+
+                budget_fit_score = max(
+                    0,
+                    100 - (
+                        (avg_rent - max_budget)
+                        / max_budget
+                    ) * 100,
+                )
 
             #################################################
             # Lifestyle Score
@@ -247,11 +254,11 @@ class RecommendationService:
 
             final_score = round(
             (
-               final_base_score * 0.50
-               + lifestyle_score * 0.10
-               + priority_score * 0.15
-               + affordability_score * 0.15
-               + inventory_score * 0.10
+                final_base_score * 0.25
+                + lifestyle_score * 0.20
+                + priority_score * 0.25
+                + budget_fit_score * 0.20
+                + inventory_score * 0.10
             )
             + commute_bonus,
             2,
@@ -294,7 +301,7 @@ class RecommendationService:
 
             final_score = round(
                 final_score
-                + similarity_score * 10,
+                + similarity_score * 5,
                 2,
             )
 
@@ -303,62 +310,28 @@ class RecommendationService:
                 min(final_score, 100),
             )
 
-            #################################################
-            # Explanation
-            #################################################
-
-            reason = "Balanced Recommendation"
-
-            if commute_bonus > 0:
-                reason = "Near Work Location"
-
-            elif affordability_score >= 80:
-                reason = "Budget Friendly"
-
-            elif inventory_score >= 60:
-                reason = "High Availability"
-
-            elif density_score >= 70:
-                reason = "Active Lifestyle Area"
-            print(
-                locality,
-                "base=",
-                round(
-                    final_base_score,
-                    2,
-                ),
-                "lifestyle=",
-                round(
-                    lifestyle_score,
-                    2,
-                ),
-                "priority=",
-                round(
-                    priority_score,
-                    2,
-                ),
-                "final=",
-                round(
-                    final_score,
-                    2,
-                ),
-
-            )
             highlights = []
 
-
-
             if commute_bonus > 0:
-                highlights.append("Near Work Location")
+                highlights.append("Near Work")
 
-            if affordability_score >= 80:
-                highlights.append("Budget Friendly")
+            if min_budget <= avg_rent <= max_budget:
+                highlights.append("Within Budget")
+
+            elif avg_rent < min_budget:
+                highlights.append("Below Budget")
+
+            else:
+                highlights.append("Above Budget")
 
             if inventory_score >= 60:
-                highlights.append("High Availability")
+                highlights.append("Many Listings")
 
             if density_score >= 70:
-                highlights.append("Active Lifestyle Area")
+                highlights.append("Active Area")
+
+            elif density_score <= 35:
+                highlights.append("Quiet Area")
 
             if lifestyle.lower() == "student":
                 highlights.append("Student Friendly")
@@ -366,10 +339,11 @@ class RecommendationService:
             elif lifestyle.lower() == "family":
                 highlights.append("Family Friendly")
 
-            if highlights:
-                reason = ", ".join(highlights)
-            else:
-                reason = "Balanced Recommendation"
+            reason = (
+                highlights[0]
+                if highlights
+                else "Balanced Recommendation"
+            )
 
             scored_items.append(
                 {
@@ -419,7 +393,7 @@ class RecommendationService:
                         ),
 
                         affordability_score=round(
-                            affordability_score,
+                            budget_fit_score,
                             2,
                         ),
 
@@ -429,8 +403,6 @@ class RecommendationService:
                     ),
                 }
             )
-
-            print("APPENDED:", locality)
 
         scored_items.sort(
             key=lambda x: x["score"],

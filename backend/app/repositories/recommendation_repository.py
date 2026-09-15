@@ -100,9 +100,4 @@ class RecommendationRepository:
 
             rows = cur.fetchall()
 
-            print("================================")
-            print("FIRST DB ROW")
-            print(rows[0] if rows else "NO ROWS")
-            print("================================")
-
             return rows
