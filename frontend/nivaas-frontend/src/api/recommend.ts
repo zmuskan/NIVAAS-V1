@@ -4,8 +4,6 @@ import { budgetRanges, type BudgetKey } from "@/data/nivaas";
 const API_BASE = "https://nivaas-backend.onrender.com";
 
 export async function getRecommendations(answers: any) {
-    console.log("ANSWERS", answers);
-
     const budgetMap: Record<
         BudgetKey,
         { min: number; max: number }
@@ -42,8 +40,6 @@ export async function getRecommendations(answers: any) {
             Boolean(answers.workArea),
     };
 
-    console.log("REQUEST BODY", requestBody);
-
     const response = await fetch(
         `${API_BASE}/recommend`,
         {
@@ -57,20 +53,15 @@ export async function getRecommendations(answers: any) {
 
     if (!response.ok) {
         const errorText = await response.text();
-        console.error("Backend Error:", errorText);
         throw new Error(errorText);
     }
 
     const data = await response.json();
 
-    console.log("RESPONSE", data);
-
     const items =
         data.items ??
         data.recommendations ??
         [];
-
-    console.log("ITEMS", items);
 
     return items.map(mapRecommendationToMatch);
 }

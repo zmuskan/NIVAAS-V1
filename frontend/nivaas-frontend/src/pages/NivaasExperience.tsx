@@ -16,15 +16,18 @@ export default function NivaasExperience() {
     });
 
     const [matches, setMatches] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (stage !== "results") return;
 
+        setIsLoading(true);
         getRecommendations(answers)
             .then((data) => {
                 setMatches(data);
             })
-            .catch(console.error);
+            .catch(() => setMatches([]))
+            .finally(() => setIsLoading(false));
     }, [stage, answers]);
 
     return (
@@ -33,6 +36,7 @@ export default function NivaasExperience() {
                 <Journey
                     onComplete={(a) => {
                         setAnswers(a);
+                        setIsLoading(true);
                         setStage("results");
                     }}
                 />
@@ -42,11 +46,14 @@ export default function NivaasExperience() {
                 <Results
                     answers={answers}
                     matches={matches}
+                    isLoading={isLoading}
                     onRestart={() => {
                         setAnswers({
                             name: "",
                             priorities: [],
                         });
+                        setMatches([]);
+                        setIsLoading(false);
 
                         setStage("journey");
                     }}

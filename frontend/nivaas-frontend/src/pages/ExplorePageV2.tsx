@@ -13,15 +13,9 @@ export default function LocalityProfilePage() {
     useEffect(() => {
         if (!slug) return;
 
-        console.log("slug:", slug);
-
         const localityName = slug;
 
-        console.log("calling api for:", localityName);
-
         getLocality(localityName).then((api) => {
-            console.log("api response:", api);
-
             const merged = {
                 id: slug,
                 name: api.name,

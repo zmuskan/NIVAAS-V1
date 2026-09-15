@@ -105,10 +105,12 @@ function generateNarrative(match: Match): string {
 export function Results({
     answers,
     matches,
+    isLoading,
     onRestart,
 }: {
     answers: Answers;
     matches: Match[];
+    isLoading: boolean;
     onRestart: () => void;
 }) {
     const navigate = useNavigate();
@@ -118,6 +120,37 @@ export function Results({
 
     const goToLocality = (name: string) =>
         navigate(`/locality/${encodeURIComponent(name)}`);
+
+    if (isLoading) {
+        return (
+            <section className="relative flex min-h-screen items-center justify-center px-5 py-24">
+                <div className="w-full max-w-xl text-center">
+                    <div className="mx-auto size-10 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
+                    <h2 className="mt-6 text-3xl text-foreground sm:text-4xl">
+                        Finding neighbourhoods that fit
+                    </h2>
+                    <p className="mt-4 text-sm font-light text-muted-foreground sm:text-base">
+                        Comparing rent, inventory, lifestyle, and commute signals.
+                    </p>
+                </div>
+            </section>
+        );
+    }
+
+    if (!matches.length) {
+        return (
+            <section className="relative flex min-h-screen items-center justify-center px-5 py-24">
+                <div className="max-w-xl text-center">
+                    <h2 className="text-4xl text-foreground sm:text-5xl">
+                        No matching neighbourhoods found
+                    </h2>
+                    <p className="mt-5 text-sm font-light text-muted-foreground sm:text-base">
+                        Try widening your budget range or choosing a nearby work location.
+                    </p>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className="relative min-h-screen px-5 pb-32 pt-24">
@@ -161,7 +194,7 @@ export function Results({
                                 delay: i * 0.14,
                                 ease,
                             }}
-                            className="bg-black/60 backdrop-blur-md overflow-hidden rounded-3xl"
+                            className="bg-black/60 backdrop-blur-md overflow-hidden rounded-3xl transition-transform duration-300 hover:-translate-y-1 hover:bg-black/70"
                         >
                             <div className="grid md:grid-cols-5">
                                 <div className="relative h-56 md:col-span-2 md:h-full">
@@ -210,14 +243,23 @@ export function Results({
                                         {generateNarrative(m)}
                                     </p>
 
-                                    <div className="mt-7 grid gap-5 sm:grid-cols-3">
+                                    <div className="mt-7 grid gap-5 sm:grid-cols-4">
                                         <Fact
                                             label="Homes listed"
                                             value={m.locality.listingCount?.toLocaleString("en-IN") ?? "N/A"}
                                         />
 
                                         <Fact
-                                            label="Inventory Score"
+                                            label="Inventory Status"
+                                            value={
+                                                m.locality.listingCount !== undefined && m.locality.listingCount < 5
+                                                    ? "Limited"
+                                                    : "Healthy"
+                                            }
+                                        />
+
+                                        <Fact
+                                            label="Inventory score"
                                             value={
                                                 m.locality.inventoryScore !== undefined
                                                     ? `${Math.round(
@@ -278,7 +320,7 @@ export function Results({
 
                                     <button
                                         onClick={() => goToLocality(m.locality.name)}
-                                        className="mt-8 rounded-full bg-[image:var(--gradient-dusk)] px-9 py-3.5 text-xs track-wide text-primary-foreground transition-transform hover:-translate-y-0.5"
+                                        className="mt-8 rounded-full bg-[image:var(--gradient-dusk)] px-9 py-3.5 text-xs track-wide text-primary-foreground transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
                                     >
                                         Explore {m.locality.name}
                                     </button>
@@ -310,7 +352,7 @@ export function Results({
                             {remainingMatches.map((m, i) => (
                                 <div
                                     key={m.locality.id}
-                                    className="w-[320px] shrink-0 snap-start overflow-hidden rounded-2xl bg-black/60 backdrop-blur-md"
+                                    className="w-[320px] shrink-0 snap-start overflow-hidden rounded-2xl bg-black/60 backdrop-blur-md transition-transform duration-300 hover:-translate-y-1 hover:bg-black/70"
                                 >
                                     <div className="relative h-32">
                                         <img
@@ -326,7 +368,7 @@ export function Results({
                                             {m.locality.name}
                                         </h4>
 
-                                        <div className="mt-3 flex items-center justify-between gap-3">
+                                        <div className="mt-3 grid grid-cols-2 gap-4">
                                             <div>
                                                 <p className="track-wide text-[0.45rem] text-muted-foreground">
                                                     Avg rent
@@ -338,6 +380,17 @@ export function Results({
                                                     <span className="text-[0.65rem] text-muted-foreground">
                                                         {" "}/mo
                                                     </span>
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <p className="track-wide text-[0.45rem] text-muted-foreground">
+                                                    Inventory status
+                                                </p>
+                                                <p className="mt-0.5 text-sm text-foreground">
+                                                    {m.locality.listingCount !== undefined && m.locality.listingCount < 5
+                                                        ? "Limited"
+                                                        : "Healthy"}
                                                 </p>
                                             </div>
 
@@ -353,7 +406,7 @@ export function Results({
 
                                         <button
                                             onClick={() => goToLocality(m.locality.name)}
-                                            className="mt-5 w-full rounded-full border border-white/15 px-4 py-2 text-[0.65rem] track-wide text-foreground transition-colors hover:border-white/30 hover:bg-white/5"
+                                            className="mt-5 w-full rounded-full border border-white/15 px-4 py-2 text-[0.65rem] track-wide text-foreground transition-all duration-300 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/5"
                                         >
                                             Explore {m.locality.name}
                                         </button>

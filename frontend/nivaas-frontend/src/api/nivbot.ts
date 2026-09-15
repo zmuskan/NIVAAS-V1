@@ -29,11 +29,8 @@ export async function askNivBot(
             }
         );
 
-        console.log("NIVBOT SUCCESS", response.data);
-
         return response.data;
-    } catch (error) {
-        console.error("NIVBOT FAILED", error);
-        throw error;
+    } catch {
+        throw new Error("Unable to reach the NIVAAS assistant.");
     }
 }

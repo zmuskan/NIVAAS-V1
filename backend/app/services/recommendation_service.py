@@ -89,7 +89,7 @@ class RecommendationService:
 
             listing_count = int(row["listing_count"])
 
-            if listing_count < 5:
+            if max_budget < 60000 and listing_count < 5:
                 continue
 
             final_base_score = float(

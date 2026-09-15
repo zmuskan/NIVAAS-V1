@@ -11,12 +11,9 @@ export default function ExplorePage() {
         fetch("https://nivaas-backend.onrender.com/localities")
             .then((res) => res.json())
             .then((data) => {
-                console.log(data.items.slice(0, 20));
                 setLocalities(data.items || []);
             })
-            .catch((err) => {
-                console.error("Failed to load localities:", err);
-            });
+            .catch(() => setLocalities([]));
     }, []);
 
     const filteredLocalities = localities.filter((item) =>

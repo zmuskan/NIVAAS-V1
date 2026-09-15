@@ -16,10 +16,7 @@ export default function LocalityProfilePage() {
 
         getLocality(slug)
             .then((api) => {
-                if (!api?.name) {
-                    console.error("Locality not found");
-                    return;
-                }
+                if (!api?.name) return;
 
                 const merged = {
                     id: slug,
@@ -49,24 +46,9 @@ export default function LocalityProfilePage() {
 
                 };
 
-                console.log(
-                    "API LOCALITY =",
-                    api
-                );
-
-                console.log(
-                    "MERGED LOCALITY =",
-                    merged
-                );
-
                 setLocality(merged);
             })
-            .catch((err) => {
-                console.error(
-                    "Failed to load locality:",
-                    err
-                );
-            });
+            .catch(() => setLocality(null));
     }, [slug]);
 
     if (!locality) {
