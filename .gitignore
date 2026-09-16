@@ -11,6 +11,7 @@ __pycache__/
 *.pyd
 *.so
 *.egg-info/
+*.egg
 
 # ------------------------------------------------------------
 # Virtual Environments
@@ -60,6 +61,7 @@ htmlcov/
 .DS_Store
 .AppleDouble
 Thumbs.db
+desktop.ini
 
 # ------------------------------------------------------------
 # Logs
@@ -74,13 +76,25 @@ docker-data/
 postgres-data/
 
 # ------------------------------------------------------------
-# Database Dumps
+# Database Dumps / Backups
 # ------------------------------------------------------------
 *.dump
 *.bak
+*.sql.gz
 
-# Keep SQL source files under version control
+nivaas_backup.sql
+nivaas_backup_utf8.sql
+nivaas_backup_supabase.sql
+
+# Keep schema files tracked
 !db/**/*.sql
+
+# ------------------------------------------------------------
+# SQLite / Local Databases
+# ------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
 
 # ------------------------------------------------------------
 # Data Exports
@@ -89,7 +103,7 @@ data/exports/*
 !data/exports/.gitkeep
 
 # ------------------------------------------------------------
-# Machine Learning Models
+# Machine Learning / Recommendation Engine
 # ------------------------------------------------------------
 *.pkl
 *.joblib
@@ -97,6 +111,12 @@ data/exports/*
 *.onnx
 *.pt
 *.pth
+
+models/
+embeddings/
+vectorstore/
+faiss_index/
+*.faiss
 
 # ------------------------------------------------------------
 # Build Artifacts
@@ -110,12 +130,31 @@ dist/
 .python-version
 
 # ------------------------------------------------------------
-# Local Databases
+# Node / React / Vite
 # ------------------------------------------------------------
-*.db
-nivaas_backup.sql
+node_modules/
+.vite/
 
-# Database backups
-nivaas_backup.sql
-nivaas_backup_utf8.sql
-nivaas_backup_supabase.sqlgi 
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ------------------------------------------------------------
+# Temporary Files
+# ------------------------------------------------------------
+tmp/
+temp/
+*.tmp
+
+# ------------------------------------------------------------
+# Local Generated Assets
+# ------------------------------------------------------------
+*.zip
+*.7z
+
+# ------------------------------------------------------------
+# Secrets
+# ------------------------------------------------------------
+secrets.json
+credentials.json
+service-account.json
