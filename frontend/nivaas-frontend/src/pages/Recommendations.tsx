@@ -41,9 +41,9 @@ export default function Recommendations() {
                     </div>
                 ) : recommendations.length === 0 ? (
                     <div className="rounded-3xl border border-white/10 bg-white/5 p-8 text-center">
-                        <h2 className="text-2xl">No matching neighbourhoods found</h2>
+                        <h2 className="text-2xl">No localities matched your current criteria.</h2>
                         <p className="mt-3 text-white/60">
-                            Try widening your budget range or choosing a nearby work location.
+                            Try adjusting your budget range or preferences to explore more options.
                         </p>
                     </div>
                 ) : (

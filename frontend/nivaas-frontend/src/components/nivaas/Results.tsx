@@ -55,7 +55,7 @@ function generateNarrative(match: Match): string {
     } else if (overallTier === "moderate") {
         clauses.push("this locality covers most of what you're looking for");
     } else if (overallTier === "low") {
-        clauses.push("this locality touches on some of your priorities");
+        clauses.push("this locality aligns with several of the preferences you selected");
     } else {
         clauses.push("this locality was shortlisted based on your preferences");
     }
@@ -69,8 +69,9 @@ function generateNarrative(match: Match): string {
 
     // Inventory / choice.
     if (locality.listingCount !== undefined) {
-        const listingsPhrase =
-            inventoryTier === "high"
+        const listingsPhrase = locality.listingCount < 5
+            ? "with limited inventory currently available"
+            : inventoryTier === "high"
                 ? "giving you plenty of rental choice"
                 : inventoryTier === "moderate"
                     ? "giving you a healthy amount of rental choice"
@@ -142,10 +143,10 @@ export function Results({
             <section className="relative flex min-h-screen items-center justify-center px-5 py-24">
                 <div className="max-w-xl text-center">
                     <h2 className="text-4xl text-foreground sm:text-5xl">
-                        No matching neighbourhoods found
+                        No localities matched your current criteria.
                     </h2>
                     <p className="mt-5 text-sm font-light text-muted-foreground sm:text-base">
-                        Try widening your budget range or choosing a nearby work location.
+                        Try adjusting your budget range or preferences to explore more options.
                     </p>
                 </div>
             </section>

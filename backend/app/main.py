@@ -21,7 +21,6 @@ from backend.app.api.recommendation import router as recommendation_router
 from backend.app.api.similar import router as similar_router
 from backend.app.api.locality_profile import router as locality_profile_router
 from backend.app.api.localities import router as localities_router
-from backend.app.api.recommend_v2 import router as recommend_router
 
 
 logging.basicConfig(

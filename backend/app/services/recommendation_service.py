@@ -62,13 +62,10 @@ class RecommendationService:
         limit: int,
     ) -> LocalityRecommendationListResponse:
 
-        print("FILTERING", min_budget, max_budget)
-
         rows = self.repository.fetch_candidates(
             min_budget,
             max_budget,
         )
-        print("ROWS RETURNED:", len(rows))
 
         scored_items = []
 
