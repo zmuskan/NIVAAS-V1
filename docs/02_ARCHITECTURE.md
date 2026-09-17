@@ -2,392 +2,368 @@
 
 **Version:** 1.0.0
 **Status:** Active
-**Last Updated:** July 2026
+**Last Updated:** September 2026
 
 ---
 
 # Purpose
 
-This document describes the overall architecture of NIVAAS, the responsibilities of each component, and how data flows through the system.
+This document describes the architecture of NIVAAS, the responsibilities of each system component, and how data flows through the platform.
 
-The architecture is designed to be modular, scalable, cloud-agnostic, and production-ready.
+NIVAAS follows a layered architecture that separates data ingestion, storage, feature engineering, recommendation logic, APIs, and user interfaces.
+
+The goal is to keep the system modular, maintainable, and extensible while supporting future analytics and recommendation capabilities.
 
 ---
 
 # High-Level Architecture
 
-```
-                    External Data Sources
-      (NoBroker, Housing, MagicBricks, OSM, APIs)
-                           │
-                           ▼
-            Playwright + BeautifulSoup Scrapers
-                           │
-                           ▼
-                    RAW Data Layer
-                  (PostgreSQL / PostGIS)
-                           │
-                           ▼
-                  ELT Pipeline (dbt)
-                           │
-                           ▼
-     ┌───────────────┬───────────────────┐
-     ▼               ▼                   ▼
- STAGING         CORE MODELS      KNOWLEDGE BASE
-     │               │                   │
-     │               ▼                   ▼
-     │         Feature Store         pgvector
-     │               │                   │
-     └───────────────┴──────────────┐
-                                    ▼
-                     ML + RAG Inference Layer
-                                    │
-                    ┌───────────────┴───────────────┐
-                    ▼                               ▼
-            Recommendation Engine          Gemini Assistant
-                    │                               │
-                    └───────────────┬───────────────┘
-                                    ▼
-                               FastAPI Backend
-                                    │
-                                    ▼
-                            Streamlit Frontend
-                                    │
-                                    ▼
-                                 End Users
+```text
+                 External Data Sources
+      (Rental Data, OSM, Metro, GeoSpatial Data)
+                              │
+                              ▼
+
+                     Data Ingestion Layer
+             (Loaders, Scrapers, Data Import Jobs)
+                              │
+                              ▼
+
+                     PostgreSQL + PostGIS
+                              │
+                              ▼
+
+                      ELT Pipelines
+                              │
+      ┌───────────────────────┼───────────────────────┐
+      ▼                       ▼                       ▼
+
+   Raw Layer             Core Layer            Analytics Layer
+      │                       │                       │
+      └───────────────────────┴───────────────────────┘
+                              │
+                              ▼
+
+                      Feature Store
+                              │
+                              ▼
+
+                  Recommendation Engine
+                              │
+                              ▼
+
+                        FastAPI APIs
+                              │
+                              ▼
+
+                React + TypeScript Frontend
+                              │
+                              ▼
+
+                           End Users
 ```
 
 ---
 
 # Architectural Principles
 
-- Modular architecture
-- ELT-first data processing
-- Cloud-agnostic deployment
+The platform follows several core principles:
+
 - Separation of concerns
-- Immutable raw data
-- Production-ready design
-- Independent, testable components
+- ELT-first data processing
+- Database as the source of truth
+- Modular service-oriented design
+- Explainable recommendation logic
+- Reproducible local development
+- Future extensibility
+- Minimal frontend business logic
 
 ---
 
-# Component Responsibilities
+# System Layers
 
-## Data Collection
+---
 
-Responsible for collecting rental listings and external datasets.
+# 1. Data Ingestion Layer
 
-### Responsibilities
+Responsible for collecting and loading datasets into the platform.
 
-- Scrape rental platforms
-- Collect infrastructure data
-- Collect environmental data
-- Store raw responses
+Sources include:
 
-Output
+- Rental datasets
+- OpenStreetMap data
+- Metro station data
+- Ward boundary datasets
+- Locality reference datasets
 
-```
-RAW Layer
+Responsibilities:
+
+- Data collection
+- Data normalization
+- Data validation
+- Data loading
+
+Output:
+
+```text
+Raw Database Tables
 ```
 
 ---
 
-## ELT Layer
+# 2. Database Layer
 
-Responsible for transforming raw data into analytics-ready datasets.
+The database serves as the central storage layer.
 
-### Responsibilities
+Technology:
 
-- Data cleaning
+- PostgreSQL
+- PostGIS
+
+Responsibilities:
+
+- Rental data storage
+- Locality storage
+- Amenity storage
+- Metro data storage
+- Spatial queries
+- Historical data retention
+
+The database acts as the single source of truth for all platform data.
+
+---
+
+# 3. ELT Layer
+
+Responsible for transforming raw datasets into structured analytical models.
+
+Responsibilities:
+
 - Standardization
+- Cleaning
 - Deduplication
 - Validation
+- Aggregation
 - Feature generation
 
-Output
+Flow:
 
-```
+```text
+Raw
+ ↓
 Staging
-
-↓
-
+ ↓
 Core
-
-↓
-
+ ↓
 Feature Store
 ```
 
 ---
 
-## Database Layer
+# 4. Feature Store
 
-Central storage for all project data.
+The feature store contains engineered locality-level and property-level features used by downstream analytics and recommendation services.
 
-Technologies
+Examples:
 
-- PostgreSQL
-- PostGIS
-- pgvector
+- Average rent
+- Rent range
+- Property density
+- Amenity density
+- Metro accessibility
+- Hospital accessibility
+- Restaurant density
+- Walkability indicators
+- Livability metrics
 
-Responsibilities
+Responsibilities:
 
-- Transactional storage
-- Spatial queries
-- Historical tracking
-- Vector storage
+- Centralized feature storage
+- Consistent analytics inputs
+- Recommendation support
 
 ---
 
-## Machine Learning Layer
+# 5. Recommendation Layer
 
-Responsible for predictive analytics.
+Responsible for generating locality recommendations.
 
-Models include
+Inputs:
 
-- Rent Prediction
-- Livability Scoring
-- Recommendation Engine
+- User preferences
+- Budget constraints
+- Locality features
+- Accessibility metrics
+- Density metrics
 
-Responsibilities
+Responsibilities:
 
-- Training
-- Evaluation
-- Inference
+- Candidate retrieval
+- Similarity calculations
+- Ranking
+- Recommendation scoring
 - Explainability
 
----
+Output:
 
-## Computer Vision Layer
-
-Responsible for extracting visual features.
-
-Possible inputs
-
-- Street imagery
-- Property images
-- Satellite imagery
-
-Generated features
-
-- Greenery
-- Cleanliness
-- Road quality
-- Building condition
-
-Outputs become structured ML features.
-
----
-
-## RAG Layer
-
-Responsible for answering locality-related questions.
-
-Pipeline
-
+```text
+Ranked Locality Recommendations
 ```
-Knowledge Base
 
-↓
+---
 
-Embedding
+# 6. Backend Layer
 
-↓
+Technology:
 
-pgvector Search
+- FastAPI
 
-↓
+Responsibilities:
 
-Context Retrieval
+- REST APIs
+- Business logic
+- Recommendation orchestration
+- Analytics endpoints
+- Locality profile endpoints
+- Data validation
 
-↓
+The backend acts as the interface between the database and frontend.
 
-Gemini
+Frontend components never communicate directly with the database.
 
-↓
+---
 
+# 7. Frontend Layer
+
+Technology:
+
+- React
+- TypeScript
+- Tailwind CSS
+- TanStack Router
+
+Responsibilities:
+
+- User onboarding flow
+- Recommendation experience
+- Locality exploration
+- Interactive dashboards
+- Locality profile pages
+- Data visualization
+
+The frontend is responsible only for presentation and user interaction.
+
+Business logic remains in the backend.
+
+---
+
+# Core Data Flow
+
+```text
+External Sources
+        ↓
+Data Ingestion
+        ↓
+PostgreSQL + PostGIS
+        ↓
+ELT Pipelines
+        ↓
+Feature Store
+        ↓
+Recommendation Engine
+        ↓
+FastAPI
+        ↓
+React Frontend
+        ↓
+Users
+```
+
+---
+
+# Recommendation Flow
+
+```text
+User Preferences
+        ↓
+Recommendation API
+        ↓
+Candidate Retrieval
+        ↓
+Feature Comparison
+        ↓
+Similarity Calculation
+        ↓
+Ranking
+        ↓
+Explanation Generation
+        ↓
 Response
 ```
 
 ---
 
-## Backend
+# Repository Structure
 
-Technology
+```text
+backend/
+├── api/
+├── services/
+├── repositories/
+├── schemas/
+├── recommendation/
+└── feature_engineering/
 
-FastAPI
+db/
+├── schema/
+├── migrations/
+└── sql/
 
-Responsibilities
+elt/
+├── sources/
+├── staging/
+├── enrichment/
+├── analytics/
+└── features/
 
-- REST APIs
-- Authentication (future)
-- Business logic
-- ML inference
-- RAG orchestration
-- Validation
-
-Frontend never communicates directly with the database.
-
----
-
-## Frontend
-
-Technology
-
-Streamlit
-
-Responsibilities
-
-- Property search
-- Interactive maps
-- Filters
-- Dashboards
-- AI assistant interface
-
-No business logic should exist in the frontend.
-
----
-
-# Data Flow
-
-```
-Scrapers
-
-↓
-
-RAW
-
-↓
-
-dbt
-
-↓
-
-STAGING
-
-↓
-
-CORE
-
-↓
-
-Feature Store
-
-↓
-
-ML Models
-
-↓
-
-FastAPI
-
-↓
-
-Frontend
+frontend/
+└── nivaas-frontend/
 ```
 
 ---
 
-# AI Flow
+# Local Development Architecture
 
-```
-User Question
-
-↓
-
-FastAPI
-
-↓
-
-Retriever
-
-↓
-
-pgvector
-
-↓
-
-Relevant Context
-
-↓
-
-Gemini
-
-↓
-
-Answer
-```
-
----
-
-# ML Flow
-
-```
-Feature Store
-
-↓
-
-Training
-
-↓
-
-Evaluation
-
-↓
-
-Serialized Model
-
-↓
-
-FastAPI
-
-↓
-
-Prediction
-```
-
----
-
-# Deployment Architecture
-
-```
+```text
 Developer
+    │
+    ▼
 
-↓
+Docker PostgreSQL
+    │
+    ▼
 
-GitHub
+FastAPI Backend
+    │
+    ▼
 
-↓
-
-GitHub Actions
-
-↓
-
-Azure
-
-├── FastAPI
-
-├── Streamlit
-
-├── PostgreSQL
-
-└── Blob Storage
+React Frontend
 ```
 
-Development uses Docker.
-
-Production runs on Azure.
+Development is designed to run entirely on a local machine using Docker and environment-based configuration.
 
 ---
 
 # Security Principles
 
-- Secrets stored in environment variables
+The platform follows several security practices:
+
+- Environment-based configuration
+- No secrets in source control
 - Parameterized SQL queries
-- Input validation using Pydantic
-- HTTPS in production
+- Input validation through Pydantic
 - Principle of least privilege
-- No secrets committed to Git
+- Explicit API validation
 
 ---
 
@@ -395,29 +371,36 @@ Production runs on Azure.
 
 The architecture intentionally:
 
+- Uses PostgreSQL as the primary datastore.
+- Uses PostGIS for spatial analysis.
+- Separates repositories from services.
 - Uses ELT instead of ETL.
-- Keeps PostgreSQL as the single source of truth.
-- Separates ML training from inference.
-- Uses Docker for reproducibility.
-- Keeps deployment cloud-agnostic.
+- Maintains a dedicated feature store.
+- Keeps recommendation logic independent of APIs.
+- Separates frontend presentation from backend business logic.
 
 ---
 
 # Future Extensions
 
-The architecture supports future additions without major redesign.
+The current architecture supports future additions such as:
 
-Potential extensions include:
-
+- Additional Bengaluru datasets
+- Advanced recommendation models
 - Multi-city support
-- Mobile application
 - User accounts
-- Reinforcement learning
-- Advanced recommendation ranking
-- Real-time notifications
+- Saved searches
 
 ---
 
 # Revision Policy
 
-Changes to this document require an architectural decision and should be reflected in `08_DECISIONS.md`.
+Architectural changes should be documented in:
+
+- Architecture documentation
+- Database documentation
+- Decision records
+
+Major architectural decisions should also be reflected in:
+
+`08_DECISIONS.md`

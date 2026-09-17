@@ -1,161 +1,375 @@
 # Technology Stack
 
 **Version:** 1.0.0
+
 **Status:** Active
-**Last Updated:** July 2026
+
+**Last Updated:** September 2026
 
 ---
 
 # Purpose
 
-This document records the technologies used in NIVAAS and the engineering rationale behind each selection.
+This document records the technologies currently used in NIVAAS and the reason each technology exists in the system.
 
-Technologies are chosen based on project requirements, maintainability, industry adoption, and cost. New technologies should only be introduced when they solve a demonstrated problem.
-
----
-
-# Programming Language
-
-| Technology | Purpose | Reason |
-|------------|---------|--------|
-| Python 3.12+ | Primary development language | Strong ecosystem for Data Engineering, Machine Learning, APIs, and AI. |
+Only technologies that are actively used in the repository should be listed here.
 
 ---
 
-# Data Collection
+# Technology Overview
 
-| Technology | Purpose | Reason |
-|------------|---------|--------|
-| Playwright | Dynamic web scraping | Handles JavaScript-heavy websites reliably. |
-| BeautifulSoup | HTML parsing | Fast and lightweight HTML parsing after page rendering. |
-
----
-
-# Data Processing
-
-| Technology | Purpose | Reason |
-|------------|---------|--------|
-| Pandas | Data manipulation | Industry standard for tabular data processing. |
-| Polars | High-performance processing | Faster processing for large datasets when required. |
-
----
-
-# Data Platform
-
-| Technology | Purpose | Reason |
-|------------|---------|--------|
-| PostgreSQL | Primary database | Reliable relational database with strong ecosystem. |
-| PostGIS | Spatial analytics | Enables geospatial queries, routing, and location analysis. |
-| pgvector | Vector storage | Stores embeddings for semantic search and RAG. |
-| dbt | ELT transformations | Version-controlled SQL transformations and data modeling. |
+| Layer | Technology |
+|---------|---------|
+| Language | Python, TypeScript |
+| Backend | FastAPI, Pydantic, Psycopg |
+| Database | PostgreSQL, PostGIS |
+| Frontend | React, Vite, Tailwind CSS |
+| Routing | TanStack Router |
+| Machine Learning | Scikit-learn |
+| AI | Gemini |
+| Infrastructure | Docker, Docker Compose |
+| Version Control | Git, GitHub |
+| CI/CD | GitHub Actions |
+| Development Tools | VS Code, Pre-Commit |
 
 ---
 
-# Machine Learning
+# Programming Languages
 
-| Technology | Purpose | Reason |
-|------------|---------|--------|
-| Scikit-learn | ML utilities | Preprocessing, evaluation, and baseline models. |
-| XGBoost | Rent prediction | High-performance model for structured tabular data. |
-| SHAP | Model explainability | Explains model predictions for transparency. |
-| Joblib | Model serialization | Lightweight model persistence for deployment. |
-
----
-
-# Computer Vision
-
-| Technology | Purpose | Reason |
-|------------|---------|--------|
-| OpenCV | Image processing | Extract visual features from street and property images. |
-
----
-
-# Generative AI
-
-| Technology | Purpose | Reason |
-|------------|---------|--------|
-| Gemini | LLM | Natural language reasoning and responses. |
-| LangChain | RAG orchestration | Connects retrieval pipeline with Gemini. |
+| Technology | Purpose |
+|------------|----------|
+| Python 3.12+ | Backend APIs, data pipelines, feature engineering, recommendation engine |
+| TypeScript | Frontend application development |
+| SQL | Database schema, migrations, analytics queries |
 
 ---
 
 # Backend
 
-| Technology | Purpose | Reason |
-|------------|---------|--------|
-| FastAPI | REST API | High performance, async support, automatic API documentation. |
-| Pydantic | Validation | Type-safe request and response validation. |
-| SQLAlchemy | Database access | ORM and parameterized SQL support. |
-| Alembic | Database migrations | Version-controlled schema changes. |
+## FastAPI
+
+Purpose:
+
+- REST APIs
+- Dependency injection
+- Request handling
+- OpenAPI documentation
+
+Reason:
+
+FastAPI provides strong typing, excellent performance, and automatic API documentation.
+
+---
+
+## Pydantic
+
+Purpose:
+
+- Request validation
+- Response validation
+- Settings management
+
+Reason:
+
+Provides type safety across the backend.
+
+---
+
+## Psycopg 3
+
+Purpose:
+
+- PostgreSQL connectivity
+- Query execution
+- Connection pooling
+
+Reason:
+
+Official PostgreSQL driver for Python.
+
+---
+
+# Database
+
+## PostgreSQL
+
+Purpose:
+
+Primary data storage layer.
+
+Stores:
+
+- Properties
+- Listings
+- Localities
+- Amenities
+- Historical data
+- Feature store data
+
+Reason:
+
+Reliable relational database with strong ecosystem support.
+
+---
+
+## PostGIS
+
+Purpose:
+
+Spatial analytics and geographic calculations.
+
+Examples:
+
+- Distance calculations
+- Metro accessibility
+- Amenity proximity
+- Geospatial aggregation
+
+Reason:
+
+Industry standard spatial extension for PostgreSQL.
 
 ---
 
 # Frontend
 
-| Technology | Purpose | Reason |
-|------------|---------|--------|
-| Streamlit | User interface | Rapid development of interactive analytics dashboards. |
-| Plotly | Visualization | Interactive charts and dashboards. |
-| Folium | Mapping | Interactive geospatial visualization. |
+## React
+
+Purpose:
+
+User interface development.
+
+Reason:
+
+Component-based architecture and strong ecosystem.
 
 ---
 
-# DevOps
+## TypeScript
 
-| Technology | Purpose | Reason |
-|------------|---------|--------|
-| Docker | Containerization | Consistent local and production environments. |
-| Docker Compose | Local orchestration | Manage multi-container development setup. |
-| GitHub Actions | CI/CD | Automated testing and deployment workflows. |
-| Git | Version control | Source code management. |
-| GitHub | Repository hosting | Collaboration and project management. |
+Purpose:
+
+Type-safe frontend development.
+
+Reason:
+
+Reduces runtime errors and improves maintainability.
 
 ---
 
-# Cloud
+## Vite
 
-| Technology | Purpose | Reason |
-|------------|---------|--------|
-| Azure | Production deployment | Public cloud deployment and cloud engineering experience. |
-| Azure Database for PostgreSQL *(or Neon during development)* | Managed database | Production-ready PostgreSQL hosting. |
-| Azure Blob Storage | Object storage | Store scraped images and static assets. |
+Purpose:
+
+Frontend build system and development server.
+
+Reason:
+
+Fast startup and efficient development workflow.
+
+---
+
+## Tailwind CSS
+
+Purpose:
+
+Frontend styling.
+
+Reason:
+
+Rapid UI development with consistent design patterns.
+
+---
+
+## TanStack Router
+
+Purpose:
+
+Application routing.
+
+Reason:
+
+Type-safe route definitions and modern React integration.
+
+---
+
+# Machine Learning
+
+## Scikit-learn
+
+Purpose:
+
+Recommendation and similarity calculations.
+
+Current Usage:
+
+- Cosine similarity
+- Ranking logic
+- Feature processing
+
+Reason:
+
+Widely adopted machine learning toolkit.
+
+---
+
+# Artificial Intelligence
+
+## Gemini
+
+Purpose:
+
+Natural language interactions through Niv.
+
+Examples:
+
+- Locality questions
+- Recommendation explanations
+- Conversational assistance
+
+Reason:
+
+Provides natural language capabilities for the platform.
+
+---
+
+# Data Engineering
+
+## ELT Pipelines
+
+Purpose:
+
+Move data through:
+
+Raw → Staging → Core → Feature Store
+
+Responsibilities:
+
+- Data cleaning
+- Normalization
+- Validation
+- Feature generation
+
+Implementation:
+
+Custom Python pipelines located in the `elt/` directory.
+
+---
+
+# Infrastructure
+
+## Docker
+
+Purpose:
+
+Containerized development environment.
+
+Reason:
+
+Consistent execution across machines.
+
+---
+
+## Docker Compose
+
+Purpose:
+
+Local orchestration.
+
+Current Services:
+
+- PostgreSQL
+- PostGIS
+
+Reason:
+
+Simple multi-service local setup.
+
+---
+
+# Version Control
+
+## Git
+
+Purpose:
+
+Source control.
+
+---
+
+## GitHub
+
+Purpose:
+
+Repository hosting and collaboration.
+
+---
+
+## GitHub Actions
+
+Purpose:
+
+Future CI/CD automation.
+
+Current Status:
+
+Workflow structure exists in the repository.
 
 ---
 
 # Development Tools
 
-| Technology | Purpose | Reason |
-|------------|---------|--------|
-| VS Code | IDE | Primary development environment. |
-| pyproject.toml | Project configuration | Standard Python project configuration. |
-| pre-commit | Code quality | Automated formatting and validation before commits. |
-| EditorConfig | Consistent formatting | Standardizes editor behavior across environments. |
+## VS Code
+
+Primary development environment.
 
 ---
 
-# Technologies Evaluated but Not Adopted
+## Pre-Commit
 
-| Technology | Reason |
-|------------|--------|
-| Apache Spark | Dataset size does not require distributed computing. |
-| Kafka | No real-time event streaming requirements. |
-| Kubernetes | Adds operational complexity without clear benefit. |
-| Airflow | Scheduled jobs can be handled with GitHub Actions. |
-| MongoDB | PostgreSQL better supports relational and geospatial workloads. |
-| Redis | Will only be introduced if performance profiling justifies caching. |
+Purpose:
+
+Code quality checks before commits.
 
 ---
 
-# Guiding Principles
+## EditorConfig
 
-- Prefer mature and widely adopted technologies.
-- Minimize operational complexity.
-- Keep the architecture cloud-agnostic where possible.
-- Choose tools based on engineering requirements, not popularity.
-- Favor maintainability and scalability over unnecessary complexity.
+Purpose:
+
+Consistent formatting across contributors.
+
+---
+
+# Technologies Not Currently Used
+
+The following technologies may be evaluated in future versions but are not currently part of the implementation:
+
+- Apache Spark
+- Kafka
+- Airflow
+- Kubernetes
+- Redis
+- MongoDB
+- OpenCV
+- XGBoost
+- SHAP
+- LangChain
+
+They should not be introduced unless a clear engineering requirement exists.
+
+---
+
+# Technology Selection Principles
+
+- Prefer simple solutions over complex infrastructure.
+- Adopt technologies only when they solve a real problem.
+- Keep operational overhead low.
+- Favor maintainability and readability.
+- Use production-proven tools.
 
 ---
 
 # Revision Policy
 
-This document should only be updated when technologies are added, removed, or replaced.
+Update this document only when a technology is added, removed, or replaced in the codebase.
