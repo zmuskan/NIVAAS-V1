@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /**
  * NIVAAS — global design foundation
@@ -58,7 +56,7 @@
   }
 
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
 
   html {
@@ -66,12 +64,15 @@
   }
 
   body {
-    @apply bg-ink text-text-primary font-sans;
+    background-color: var(--color-ink);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   .light body {
-    @apply bg-paper text-text-primary-inverse;
+    background-color: var(--color-paper);
+    color: var(--color-text-primary-inverse);
   }
 
   /* Typography system — headings default to the display face; everything
@@ -80,7 +81,7 @@
   h1,
   h2,
   h3 {
-    @apply font-display;
+    font-family: theme("fontFamily.display");
   }
 
   .font-tabular {
