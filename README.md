@@ -4,6 +4,7 @@
 
 <h1 align="center">NIVAAS</h1>
 <p align="center"><strong>Bangalore Livability Intelligence Platform</strong></p>
+<p align="center">🚀 <strong>Live Application:</strong> <https://nivaas-nivaas1.vercel.app></p>
 <p align="center">An urban intelligence platform that combines locality analytics, recommendation systems, and geospatial intelligence to help users discover the most suitable neighborhoods in Bangalore.</p>
 
 ---
@@ -119,7 +120,12 @@ Niv Assistant is available throughout for follow-up questions against the same u
 ## Recommendation Engine
 
 <p align="center">
-  <img src="docs/images/recommendation-pipeline.svg" alt="Recommendation Pipeline" width="850">
+  <a href="docs/images/recommendation-pipeline.svg">
+    <img src="docs/images/recommendation-pipeline.svg" alt="Recommendation Pipeline" width="850">
+  </a>
+</p>
+<p align="center">
+  Click image to open full-size SVG
 </p>
 
 The pipeline runs in five stages:
@@ -152,7 +158,12 @@ These are computed once per locality and stored in the feature store, rather tha
 ## System Architecture
 
 <p align="center">
-  <img src="docs/images/system-architecture.svg" alt="System Architecture" width="850">
+  <a href="docs/images/system-architecture.svg">
+    <img src="docs/images/system-architecture.svg" alt="System Architecture" width="850">
+  </a>
+</p>
+<p align="center">
+  Click image to open full-size SVG
 </p>
 
 - **React + TypeScript + TanStack Router + Vite** power the frontend experience.
@@ -168,7 +179,12 @@ These are computed once per locality and stored in the feature store, rather tha
 ## Database Design
 
 <p align="center">
-  <img src="docs/images/erd.svg" alt="Database ERD" width="850">
+  <a href="docs/images/erd.svg">
+    <img src="docs/images/erd.svg" alt="Database ERD" width="850">
+  </a>
+</p>
+<p align="center">
+  Click image to open full-size SVG
 </p>
 
 The schema is organized around **Localities** as the aggregation root — properties and listings each belong to a locality, and metro station data is used to compute locality-level accessibility metrics. Localities carry spatial geometry, which PostGIS uses to resolve proximity and accessibility relationships that feed directly into the feature store consumed by the recommendation engine.
