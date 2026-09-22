@@ -14,7 +14,7 @@
 | Resource | Link |
 |---|---|
 | Live Application | <https://nivaas-nivaas1.vercel.app> |
-| Frontend Walkthrough | Available in repository (`docs/video/nivaas_frontend_demo.mp4`) |
+| Frontend Walkthrough | [Download Demo Video](docs/video/nivaas_frontend_demo.mp4) |
 
 ---
 
@@ -38,17 +38,17 @@
 
 ## Problem Statement
 
-Choosing where to live in Bangalore means reconciling constraints that don't live in one place: rent budget, commute distance to a specific workplace, proximity to hospitals and groceries, and neighborhood character. Listing portals filter on price and configuration but leave the rest of that reasoning to the user, manually, across dozens of localities.
+Choosing where to live in Bangalore means balancing multiple factors: rent affordability, locality convenience, access to everyday amenities, and neighborhood characteristics. Listing portals allow users to filter properties, but they provide limited support for comparing entire localities across these dimensions.
 
-NIVAAS treats this as a ranking problem, not a search problem: given a user's constraints, which localities actually fit best, and why.
+NIVAAS treats this as a ranking problem rather than a search problem: given a user's preferences and constraints, which localities are the best fit, and why?
 
 ## Overview
 
 NIVAAS is designed as a data-driven recommendation platform where intelligence resides in engineered locality features, geospatial analytics, and ranking algorithms rather than LLM prompts. The conversational assistant acts as an interaction layer over the same recommendation engine.
 
-- **Locality Intelligence Layer** — structured data on properties, listings, and metro infrastructure, standardized into comparable per-locality metrics.
+- **Locality Intelligence Layer** — structured data on properties, listings, and spatially referenced locality data, standardized into comparable per-locality metrics.
 - **Recommendation Engine** — converts a user's stated constraints into a feature-based query and ranks localities by fit.
-- **Geospatial Analytics** — PostGIS-backed spatial queries (metro proximity, accessibility) underpin several of the locality metrics above.
+- **Geospatial Analytics** — PostGIS-backed spatial processing and locality intelligence features built from spatially referenced property and locality data.
 
 **Niv Assistant**, the conversational interface, sits on top of these components as an interaction layer. It is not the recommendation logic — it is a UI convenience over the same engine described below.
 
@@ -144,7 +144,6 @@ Localities are evaluated across recommendation dimensions including:
 
 - Affordability
 - Connectivity
-- Metro Accessibility
 - Walkability
 - Lifestyle
 - Hospital Accessibility
@@ -168,7 +167,7 @@ These are computed once per locality and stored in the feature store, rather tha
 
 - **React + TypeScript + TanStack Router + Vite** power the frontend experience.
 - **FastAPI** serves recommendation, locality intelligence, and geospatial APIs.
-- **Supabase PostgreSQL + PostGIS** store locality, property, listing, and spatial data.
+- **Supabase PostgreSQL + PostGIS** store locality, property, listing, and spatial data used to generate locality intelligence features.
 - **Supabase** provides managed database infrastructure and data access for locality intelligence workflows.
 - **Feature Store Tables** hold precomputed locality intelligence metrics used during recommendation.
 - **Render** hosts and deploys backend API services.
@@ -187,7 +186,7 @@ These are computed once per locality and stored in the feature store, rather tha
   Click image to open full-size SVG
 </p>
 
-The schema is organized around **Localities** as the aggregation root — properties and listings each belong to a locality, and metro station data is used to compute locality-level accessibility metrics. Localities carry spatial geometry, which PostGIS uses to resolve proximity and accessibility relationships that feed directly into the feature store consumed by the recommendation engine.
+The schema is organized around **Localities** as the aggregation root. Properties and listings belong to localities, while spatial data stored in PostGIS supports locality-level analysis and future geospatial feature expansion.
 
 ## Technology Stack
 
@@ -259,7 +258,7 @@ Frontend: `http://localhost:5173`
 
 - Formal evaluation of recommendation quality (currently validated by manual review, not an automated metric).
 - Incorporate user feedback on recommendations as a future input to locality scoring.
-- Expand geospatial accessibility coverage beyond metro stations.
+- Expand geospatial accessibility coverage with additional spatial data sources.
 
 ## Author
 
