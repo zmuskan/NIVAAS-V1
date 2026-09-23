@@ -53,6 +53,7 @@ NIVAAS is designed as a data-driven recommendation platform where intelligence r
 **Niv Assistant**, the conversational interface, sits on top of these components as an interaction layer. It is not the recommendation logic — it is a UI convenience over the same engine described below.
 
 NIVAAS is positioned as a recommendation system, geospatial analytics platform, and urban intelligence product rather than a chatbot-centric application.
+The platform follows a feature-engineering-first architecture where locality intelligence is computed offline and consumed by the recommendation engine through precomputed feature stores.
 
 ## Dataset Scale
 
@@ -62,7 +63,7 @@ NIVAAS is positioned as a recommendation system, geospatial analytics platform, 
 | Listings | 500+ |
 | Localities | 1,122+ |
 | Metro Stations | 128+ |
-| Recommendation Dimensions | 15+ |
+| Engineered Locality Features | 8+ |
 
 ## User Journey
 
@@ -131,7 +132,7 @@ Niv Assistant is available throughout for follow-up questions against the same u
 The pipeline runs in five stages:
 
 1. **Candidate Retrieval** — localities are narrowed down using hard constraints (budget range, inventory availability) before any scoring happens, keeping the candidate set bounded.
-2. **Feature Extraction** — each candidate locality's stored feature vector (rent, accessibility, density metrics) is pulled from the feature store.
+2. **Feature Extraction** — each candidate locality's stored feature vector (rent statistics, inventory metrics and density metrics) is pulled from the feature store.
 3. **Scoring** — candidates are scored against the user's stated weighting across the recommendation dimensions.
 4. **Similarity Ranking** — the user's constraint vector is compared against each candidate locality's feature vector using cosine similarity (scikit-learn), producing a ranked order.
 5. **Result Assembly** — per-dimension sub-scores are returned alongside the final rank, so a result can be inspected rather than treated as a single opaque number.
@@ -140,19 +141,21 @@ Feature vectors and similarity computation are built with **NumPy** and **scikit
 
 ## Locality Intelligence Features
 
-Localities are evaluated across recommendation dimensions including:
+NIVAAS stores precomputed locality-level features inside the feature store and uses them during recommendation generation.
 
-- Affordability
-- Connectivity
-- Walkability
-- Lifestyle
-- Hospital Accessibility
-- Grocery Accessibility
-- Restaurant Density
-- Inventory Availability
-- Urban Convenience
+Current production features include:
 
-These are computed once per locality and stored in the feature store, rather than recalculated per request — the recommendation engine consumes precomputed features at query time.
+- Inventory Score
+- Density Score
+- Overall Score
+- Average Rent
+- Minimum Rent
+- Maximum Rent
+- Listing Count
+- Property Count
+
+Feature engineering jobs compute these values offline and persist them in PostgreSQL. The recommendation engine consumes the precomputed feature vectors at query time rather than performing expensive calculations per request.
+
 
 ## System Architecture
 
@@ -168,7 +171,7 @@ These are computed once per locality and stored in the feature store, rather tha
 - **React + TypeScript + TanStack Router + Vite** power the frontend experience.
 - **FastAPI** serves recommendation, locality intelligence, and geospatial APIs.
 - **Supabase PostgreSQL + PostGIS** store locality, property, listing, and spatial data used to generate locality intelligence features.
-- **Supabase** provides managed database infrastructure and data access for locality intelligence workflows.
+- **Supabase** provides managed PostgreSQL infrastructure, authentication-ready APIs, and database management capabilities.
 - **Feature Store Tables** hold precomputed locality intelligence metrics used during recommendation.
 - **Render** hosts and deploys backend API services.
 - **Vercel** hosts and deploys the production frontend application.
@@ -186,7 +189,7 @@ These are computed once per locality and stored in the feature store, rather tha
   Click image to open full-size SVG
 </p>
 
-The schema is organized around **Localities** as the aggregation root. Properties and listings belong to localities, while spatial data stored in PostGIS supports locality-level analysis and future geospatial feature expansion.
+The schema is organized around **Localities** as the aggregation root.Properties and listings are linked to localities through a normalized relational model. PostGIS geometry columns enable spatial indexing, locality boundary storage, centroid calculations and future geospatial feature engineering workflows.
 
 ## Technology Stack
 
@@ -195,8 +198,8 @@ The schema is organized around **Localities** as the aggregation root. Propertie
 | Frontend | React, TypeScript, Vite, TailwindCSS, TanStack Router |
 | Backend | FastAPI, Python |
 | Database | Supabase PostgreSQL, PostGIS |
-| Cloud Services | Supabase |
 | Data & Analytics | NumPy, scikit-learn |
+| Recommendation Engine | Cosine Similarity, Feature-Based Ranking |
 | State Management | Zustand |
 | API Layer | Axios |
 | Deployment | Vercel, Render |
