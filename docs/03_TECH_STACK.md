@@ -1,133 +1,26 @@
 # Technology Stack
 
-**Version:** 1.0.0
+## Overview
 
-**Status:** Active
+This document records the technologies actively used in NIVAAS and the role each technology plays within the platform.
 
-**Last Updated:** September 2026
-
----
-
-# Purpose
-
-This document records the technologies currently used in NIVAAS and the reason each technology exists in the system.
-
-Only technologies that are actively used in the repository should be listed here.
+NIVAAS is built as a full-stack urban intelligence platform combining data engineering, geospatial analytics, recommendation systems, and modern web development.
 
 ---
 
-# Technology Overview
+# Technology Summary
 
-| Layer | Technology |
+| Layer | Technologies |
 |---------|---------|
-| Language | Python, TypeScript |
-| Backend | FastAPI, Pydantic, Psycopg |
-| Database | PostgreSQL, PostGIS |
-| Frontend | React, Vite, Tailwind CSS |
-| Routing | TanStack Router |
-| Machine Learning | Scikit-learn |
-| AI | Gemini |
+| Frontend | React, TypeScript, TailwindCSS, Vite, TanStack Router |
+| Backend | FastAPI, Python, Pydantic |
+| Database | PostgreSQL, PostGIS, Supabase |
+| Recommendation Engine | NumPy, scikit-learn |
+| API Communication | Axios |
+| State Management | Zustand |
 | Infrastructure | Docker, Docker Compose |
+| Deployment | Vercel, Render, Supabase |
 | Version Control | Git, GitHub |
-| CI/CD | GitHub Actions |
-| Development Tools | VS Code, Pre-Commit |
-
----
-
-# Programming Languages
-
-| Technology | Purpose |
-|------------|----------|
-| Python 3.12+ | Backend APIs, data pipelines, feature engineering, recommendation engine |
-| TypeScript | Frontend application development |
-| SQL | Database schema, migrations, analytics queries |
-
----
-
-# Backend
-
-## FastAPI
-
-Purpose:
-
-- REST APIs
-- Dependency injection
-- Request handling
-- OpenAPI documentation
-
-Reason:
-
-FastAPI provides strong typing, excellent performance, and automatic API documentation.
-
----
-
-## Pydantic
-
-Purpose:
-
-- Request validation
-- Response validation
-- Settings management
-
-Reason:
-
-Provides type safety across the backend.
-
----
-
-## Psycopg 3
-
-Purpose:
-
-- PostgreSQL connectivity
-- Query execution
-- Connection pooling
-
-Reason:
-
-Official PostgreSQL driver for Python.
-
----
-
-# Database
-
-## PostgreSQL
-
-Purpose:
-
-Primary data storage layer.
-
-Stores:
-
-- Properties
-- Listings
-- Localities
-- Amenities
-- Historical data
-- Feature store data
-
-Reason:
-
-Reliable relational database with strong ecosystem support.
-
----
-
-## PostGIS
-
-Purpose:
-
-Spatial analytics and geographic calculations.
-
-Examples:
-
-- Distance calculations
-- Metro accessibility
-- Amenity proximity
-- Geospatial aggregation
-
-Reason:
-
-Industry standard spatial extension for PostgreSQL.
 
 ---
 
@@ -135,124 +28,180 @@ Industry standard spatial extension for PostgreSQL.
 
 ## React
 
-Purpose:
+Used to build the user interface through reusable components.
 
-User interface development.
+Responsibilities:
 
-Reason:
-
-Component-based architecture and strong ecosystem.
+- Recommendation workflow
+- Locality exploration
+- Locality profiles
+- Dashboard views
 
 ---
 
 ## TypeScript
 
-Purpose:
+Provides static typing across the frontend codebase.
 
-Type-safe frontend development.
+Benefits:
 
-Reason:
+- Improved maintainability
+- Better developer tooling
+- Reduced runtime errors
 
-Reduces runtime errors and improves maintainability.
+---
+
+## TailwindCSS
+
+Utility-first styling framework used throughout the frontend.
+
+Benefits:
+
+- Rapid UI development
+- Consistent styling
+- Reduced CSS complexity
 
 ---
 
 ## Vite
 
-Purpose:
+Frontend build tool and development server.
 
-Frontend build system and development server.
+Benefits:
 
-Reason:
-
-Fast startup and efficient development workflow.
-
----
-
-## Tailwind CSS
-
-Purpose:
-
-Frontend styling.
-
-Reason:
-
-Rapid UI development with consistent design patterns.
+- Fast development startup
+- Efficient production builds
 
 ---
 
 ## TanStack Router
 
-Purpose:
-
-Application routing.
-
-Reason:
-
-Type-safe route definitions and modern React integration.
-
----
-
-# Machine Learning
-
-## Scikit-learn
-
-Purpose:
-
-Recommendation and similarity calculations.
-
-Current Usage:
-
-- Cosine similarity
-- Ranking logic
-- Feature processing
-
-Reason:
-
-Widely adopted machine learning toolkit.
-
----
-
-# Artificial Intelligence
-
-## Gemini
-
-Purpose:
-
-Natural language interactions through Niv.
-
-Examples:
-
-- Locality questions
-- Recommendation explanations
-- Conversational assistance
-
-Reason:
-
-Provides natural language capabilities for the platform.
-
----
-
-# Data Engineering
-
-## ELT Pipelines
-
-Purpose:
-
-Move data through:
-
-Raw → Staging → Core → Feature Store
+Client-side routing solution.
 
 Responsibilities:
 
-- Data cleaning
-- Normalization
-- Validation
-- Feature generation
+- Page navigation
+- Route management
+- URL-based application state
 
-Implementation:
+---
 
-Custom Python pipelines located in the `elt/` directory.
+## Zustand
+
+Lightweight frontend state management.
+
+Used for:
+
+- Shared UI state
+- Recommendation workflow state
+
+---
+
+## Axios
+
+HTTP client used for communication with backend APIs.
+
+---
+
+# Backend
+
+## FastAPI
+
+Primary backend framework.
+
+Responsibilities:
+
+- REST APIs
+- Request handling
+- Recommendation endpoints
+- Locality endpoints
+- API documentation
+
+---
+
+## Pydantic
+
+Used for:
+
+- Request validation
+- Response validation
+- Configuration management
+
+---
+
+## Python
+
+Core backend programming language.
+
+Used for:
+
+- API development
+- Recommendation engine
+- Feature engineering
+- Data processing
+
+---
+
+# Database
+
+## PostgreSQL
+
+Primary relational database.
+
+Stores:
+
+- Localities
+- Properties
+- Listings
+- Amenities
+- Historical records
+- Feature data
+
+---
+
+## PostGIS
+
+Spatial extension for PostgreSQL.
+
+Used for:
+
+- Geospatial calculations
+- Distance measurements
+- Spatial analysis
+
+---
+
+## Supabase
+
+Managed PostgreSQL platform used in production.
+
+Responsibilities:
+
+- Database hosting
+- Managed infrastructure
+- Database access
+
+---
+
+# Recommendation Engine
+
+## NumPy
+
+Used for numerical operations and vector processing.
+
+---
+
+## scikit-learn
+
+Used for recommendation calculations.
+
+Current usage:
+
+- Cosine similarity
+- Feature comparison
+- Recommendation ranking
+
+The recommendation engine is based on feature similarity rather than predictive machine learning models.
 
 ---
 
@@ -260,30 +209,39 @@ Custom Python pipelines located in the `elt/` directory.
 
 ## Docker
 
-Purpose:
+Provides a reproducible local development environment.
 
-Containerized development environment.
+Benefits:
 
-Reason:
-
-Consistent execution across machines.
+- Consistent setup
+- Environment isolation
+- Simplified onboarding
 
 ---
 
 ## Docker Compose
 
-Purpose:
+Used to orchestrate local services during development.
 
-Local orchestration.
+---
 
-Current Services:
+# Deployment
 
-- PostgreSQL
-- PostGIS
+## Vercel
 
-Reason:
+Hosts the production frontend application.
 
-Simple multi-service local setup.
+---
+
+## Render
+
+Hosts the production FastAPI backend.
+
+---
+
+## Supabase
+
+Hosts the production PostgreSQL + PostGIS database.
 
 ---
 
@@ -291,59 +249,31 @@ Simple multi-service local setup.
 
 ## Git
 
-Purpose:
-
-Source control.
+Source control system used throughout development.
 
 ---
 
 ## GitHub
 
-Purpose:
-
-Repository hosting and collaboration.
+Repository hosting, collaboration, and project management.
 
 ---
 
-## GitHub Actions
+# Design Philosophy
 
-Purpose:
+Technology choices in NIVAAS follow several principles:
 
-Future CI/CD automation.
-
-Current Status:
-
-Workflow structure exists in the repository.
-
----
-
-# Development Tools
-
-## VS Code
-
-Primary development environment.
+- Prefer simple solutions over unnecessary complexity.
+- Use proven and well-supported tools.
+- Keep operational overhead low.
+- Prioritize maintainability and readability.
+- Select technologies that directly support product requirements.
 
 ---
 
-## Pre-Commit
+# Current Scope
 
-Purpose:
-
-Code quality checks before commits.
-
----
-
-## EditorConfig
-
-Purpose:
-
-Consistent formatting across contributors.
-
----
-
-# Technologies Not Currently Used
-
-The following technologies may be evaluated in future versions but are not currently part of the implementation:
+The current implementation does not use:
 
 - Apache Spark
 - Kafka
@@ -351,25 +281,8 @@ The following technologies may be evaluated in future versions but are not curre
 - Kubernetes
 - Redis
 - MongoDB
-- OpenCV
-- XGBoost
-- SHAP
 - LangChain
+- Vector Databases
+- Deep Learning Models
 
-They should not be introduced unless a clear engineering requirement exists.
-
----
-
-# Technology Selection Principles
-
-- Prefer simple solutions over complex infrastructure.
-- Adopt technologies only when they solve a real problem.
-- Keep operational overhead low.
-- Favor maintainability and readability.
-- Use production-proven tools.
-
----
-
-# Revision Policy
-
-Update this document only when a technology is added, removed, or replaced in the codebase.
+These technologies may be evaluated in future versions if clear engineering requirements emerge.
