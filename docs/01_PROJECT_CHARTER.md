@@ -3,7 +3,7 @@
 ## Project Charter
 
 **Version:** 1.0.0
-**Status:** Active Development
+**Status:** Production Deployment
 **Project Type:** Urban Intelligence & Rental Recommendation Platform
 **Owner:** Zaiba Muskan
 **Last Updated:** September 2026
@@ -12,11 +12,11 @@
 
 # 1. Overview
 
-NIVAAS is a Bengaluru-focused Urban Intelligence Platform that helps renters evaluate and compare localities using rental market data, geospatial analytics, accessibility metrics, amenity intelligence, and recommendation models.
+NIVAAS is a Bengaluru-focused Urban Intelligence Platform that combines locality analytics, rental market intelligence, geospatial data, and recommendation algorithms to help users identify suitable neighborhoods based on their preferences and constraints.
 
-Rather than focusing only on rental listings, NIVAAS combines multiple locality signals such as rental affordability, transportation access, amenities, density, and neighborhood characteristics to support informed housing decisions.
+The platform evaluates localities rather than individual properties, transforming locality-level data into structured intelligence that can be ranked, compared, and explored through a recommendation workflow.
 
-The project is designed as a portfolio application that demonstrates Data Engineering, Backend Engineering, Geospatial Analytics, Recommendation Systems, and modern full-stack application development.
+NIVAAS serves as a portfolio project demonstrating Data Engineering, Backend Engineering, Recommendation Systems, Geospatial Analytics, Database Design, and Full Stack Development.
 
 ---
 
@@ -51,20 +51,19 @@ NIVAAS addresses this problem by consolidating locality-level intelligence into 
 
 # 4. Objectives
 
-The project demonstrates practical experience with:
+NIVAAS was built to demonstrate practical implementation of:
 
-- Data Engineering
-- ELT Pipelines
-- Geospatial Analytics
+- Data Modeling
+- PostgreSQL & PostGIS
 - Feature Engineering
 - Recommendation Systems
-- PostgreSQL & PostGIS
+- Geospatial Analytics
 - Backend API Development
-- Full Stack Application Development
-- Data Modeling
-- System Design
-- Containerization
+- Frontend Application Development
 - Cloud Deployment
+- Containerized Development
+- System Architecture Design
+- End-to-End Data Products
 
 ---
 
@@ -91,16 +90,16 @@ The project demonstrates practical experience with:
 
 Version 1 includes:
 
-1. Rental Intelligence
-2. Locality Profiles
-3. Locality Comparison
-4. Livability Analysis
-5. Metro Accessibility Analysis
-6. Amenity Accessibility Analysis
-7. Rental Market Insights
-8. Recommendation Engine
-9. Interactive Maps
-10. Locality Scoring Framework
+1. Locality Intelligence Profiles
+2. Rental Affordability Analysis
+3. Recommendation Engine
+4. Locality Ranking
+5. Inventory Analysis
+6. Density Analysis
+7. Feature-Based Scoring
+8. Explainable Recommendation Results
+9. Locality Comparison Workflows
+10. Conversational Assistant Interface
 
 ---
 
@@ -108,19 +107,21 @@ Version 1 includes:
 
 ## Included
 
-- Historical rental dataset
-- Locality-level analytics
+- Rental listing datasets
+- Locality datasets
 - Geospatial datasets
 - PostgreSQL database
-- PostGIS spatial analytics
-- ELT pipelines
+- PostGIS extensions
+- Locality feature generation
 - Feature store
 - Recommendation engine
 - FastAPI backend
 - React + TypeScript frontend
-- Dockerized local development
-- API endpoints for locality intelligence
-- Locality scoring framework
+- Dockerized development environment
+- Supabase database deployment
+- Render backend deployment
+- Vercel frontend deployment
+- Locality intelligence APIs
 
 ## Excluded
 
@@ -142,15 +143,15 @@ The following are intentionally outside Version 1:
 
 Version 1 is considered successful when the platform can:
 
-- Store and manage rental market data
-- Maintain locality-level feature data
-- Generate locality recommendations
-- Compare neighborhoods objectively
+- Maintain locality intelligence datasets
+- Generate locality-level features
+- Rank localities using recommendation algorithms
+- Produce explainable recommendation results
 - Serve recommendations through APIs
 - Display locality insights through the frontend
-- Support geospatial analysis workflows
-- Update locality features through repeatable pipelines
-- Operate through a reproducible local development environment
+- Support geospatial data workflows
+- Operate in a deployed cloud environment
+- Support reproducible local development through Docker
 
 ---
 
@@ -185,54 +186,23 @@ It is not intended to become:
 
 ---
 
-# 11. Roadmap
+# 11. Future Enhancements
 
-## Phase 1 — Data Platform
+Potential future enhancements include:
 
-- Database design
-- Data ingestion
-- Data modeling
-- ELT pipelines
-
-## Phase 2 — Feature Engineering
-
-- Locality feature generation
-- Accessibility metrics
-- Amenity analytics
-- Livability metrics
-
-## Phase 3 — Recommendation Engine
-
-- Locality ranking
-- Similarity calculations
-- Recommendation scoring
-
-## Phase 4 — Backend APIs
-
-- FastAPI services
-- Repository layer
-- Analytics endpoints
-- Recommendation endpoints
-
-## Phase 5 — Frontend Experience
-
-- Locality exploration
-- Recommendation workflow
-- Maps and visualizations
-- Locality dashboards
-
-## Phase 6 — Deployment
-
-- Containerization
-- Production configuration
-- Cloud deployment
-- Monitoring and maintenance
+- Additional locality intelligence dimensions
+- Improved recommendation personalization
+- Enhanced geospatial analytics
+- Automated data refresh workflows
+- Expanded locality coverage
+- Recommendation quality evaluation framework
+- Advanced locality comparison dashboards
 
 ---
 
 # 12. Revision Policy
 
-This document defines the overall product vision, goals, scope, and guiding principles of NIVAAS.
+This document defines the overall product vision, goals, boundaries, and guiding principles of NIVAAS.
 
 Changes should only be made when product direction, business requirements, or project scope changes.
 
